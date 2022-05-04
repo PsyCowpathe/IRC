@@ -6,7 +6,7 @@
 /*   By: cguiot <cguiot@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/03 18:30:22 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/04 16:25:16 by cguiot           ###   ########lyon.fr   */
+/*   Updated: 2022/05/04 19:38:23 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,29 +21,19 @@
 
 #define BACKLOG 10 //combien d'user en attente pour se co au serveur
 
+#include "Server.hpp"
+#include "Client.hpp"
 
-int 	parse(char *port)
-{			
-	std::string tmp = port;
-	if (tmp.size() >= 5) 
-		return (-1);
-	for (size_t i = 0; i < tmp.size(); i++)
-	{
-		if (!(isdigit(port[i])))
-			return (-1);
-	}
-	return(0);
-	
-}
-
-void	irc(char *port, char *pass)
+/*void	irc(char *port, char *pass)
 {
 	int				fd;
-	int				newfd;
+	int				clientfd[10];
 	int				value = 1;
-	struct addrinfo infos, *res;
-	struct sockaddr newaddr;
-	socklen_t 		newaddrlen;
+	struct addrinfo infos;
+	struct addrinfo *res;
+	struct sockaddr clientaddr[10];
+	socklen_t 		clientaddrlen[10];
+	int				i = 0;
 	(void)pass;
 
 	if (parse(port) == -1)
@@ -68,7 +58,31 @@ void	irc(char *port, char *pass)
 		perror("bind()");
 	if (listen(fd, BACKLOG) == -1) //dis au serveur d'attentre des connection entrante 
 		perror("listen()");
-	newfd = accept(fd, &newaddr, &newaddrlen); //accept les connexion recuperer par listen
+	clientfd[i] = accept(fd, &clientaddr[i], &clientaddrlen[i]); //accept les connexion recuperer par listen
+}*/
+
+
+void	irc(char *port, char *pass)
+{
+	Server	server(port, pass);
+	Client	client[1000];
+
+	try
+	{
+		server.parseport(port);
+		server.structinit();
+		server.serverinit();
+	}
+	catch (std::exception &e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+
+	while (1)
+	{
+		client[0].setFd(accept(server.getFd(), &client[0].getAddr(), &client[0].getLen()));
+		std::cout << "connected" << std::endl;
+	}
 }
 
 int		main(int argc, char **argv)
