@@ -3,31 +3,44 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: cguiot <cguiot@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/03 18:30:22 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/03 21:32:47 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/04 19:38:23 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <netdb.h>
 
 #define BACKLOG 10 //combien d'user en attente pour se co au serveur
 
-void	irc(char *port, char *pass)
+#include "Server.hpp"
+#include "Client.hpp"
+
+/*void	irc(char *port, char *pass)
 {
 	int				fd;
-	int				newfd;
+	int				clientfd[10];
 	int				value = 1;
-	struct addrinfo infos, *res;
-	struct sockaddr newaddr;
-	socklen_t 		newaddrlen;
+	struct addrinfo infos;
+	struct addrinfo *res;
+	struct sockaddr clientaddr[10];
+	socklen_t 		clientaddrlen[10];
+	int				i = 0;
 	(void)pass;
 
+	if (parse(port) == -1)
+	{
+		std::cout << "erreur dans le port" << std::endl;
+		return;
+	}
 	infos.ai_family = AF_INET; //c pour ipv4
     infos.ai_socktype = SOCK_STREAM; // c pour tcp
     infos.ai_flags = AI_PASSIVE; // rempli l'ip tout seul si le premier arg de getaddrrinfo est NULL (ip de l'host)
@@ -45,7 +58,31 @@ void	irc(char *port, char *pass)
 		perror("bind()");
 	if (listen(fd, BACKLOG) == -1) //dis au serveur d'attentre des connection entrante 
 		perror("listen()");
-	newfd = accept(fd, &newaddr, &newaddrlen); //accept les connexion recuperer par listen
+	clientfd[i] = accept(fd, &clientaddr[i], &clientaddrlen[i]); //accept les connexion recuperer par listen
+}*/
+
+
+void	irc(char *port, char *pass)
+{
+	Server	server(port, pass);
+	Client	client[1000];
+
+	try
+	{
+		server.parseport(port);
+		server.structinit();
+		server.serverinit();
+	}
+	catch (std::exception &e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+
+	while (1)
+	{
+		client[0].setFd(accept(server.getFd(), &client[0].getAddr(), &client[0].getLen()));
+		std::cout << "connected" << std::endl;
+	}
 }
 
 int		main(int argc, char **argv)
