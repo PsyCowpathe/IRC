@@ -3,20 +3,38 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: cguiot <cguiot@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/03 18:30:22 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/03 21:32:47 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/04 16:25:16 by cguiot           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <netdb.h>
 
 #define BACKLOG 10 //combien d'user en attente pour se co au serveur
+
+
+int 	parse(char *port)
+{			
+	std::string tmp = port;
+	if (tmp.size() >= 5) 
+		return (-1);
+	for (size_t i = 0; i < tmp.size(); i++)
+	{
+		if (!(isdigit(port[i])))
+			return (-1);
+	}
+	return(0);
+	
+}
 
 void	irc(char *port, char *pass)
 {
@@ -28,6 +46,11 @@ void	irc(char *port, char *pass)
 	socklen_t 		newaddrlen;
 	(void)pass;
 
+	if (parse(port) == -1)
+	{
+		std::cout << "erreur dans le port" << std::endl;
+		return;
+	}
 	infos.ai_family = AF_INET; //c pour ipv4
     infos.ai_socktype = SOCK_STREAM; // c pour tcp
     infos.ai_flags = AI_PASSIVE; // rempli l'ip tout seul si le premier arg de getaddrrinfo est NULL (ip de l'host)
