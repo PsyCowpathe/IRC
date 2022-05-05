@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/05 16:57:44 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/05 19:33:50 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <sys/select.h>
+# include <list>
 
 # define BACKLOG 10
 
@@ -31,7 +32,15 @@ class	Server
 		struct addrinfo		_infos;
 		struct addrinfo		*_res;
 		int					_nbclient;
-		Client				*_client;
+		int					_allcount;
+		std::list<Client>	_client;
+		fd_set          	_master;
+		fd_set				_watchlist;
+
+
+		void				newconnection(int *max);
+		void				moov_back(const int b);
+		void				dataReception(std::list<Client>::iterator it);
 
 	public :
 		Server(std::string port, std::string pass);
