@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 19:24:34 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/04 19:38:25 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/05 19:33:58 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,17 @@ void	Client::setFd(const int fd)
 {
 	_fd = fd;
 }
+
+void	Client::setUser(const int user)
+{
+	_user = user;
+}
+
+int		Client::getUser() const
+{
+	return (_user);
+}
+
 
 struct sockaddr	&Client::getAddr()
 {
