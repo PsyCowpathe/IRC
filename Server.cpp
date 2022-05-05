@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/05 16:57:41 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/05 19:33:57 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ Server::Server(std::string port, std::string pass)
 	_port = port;
 	_pass = pass;
 	_nbclient = 0;
-	_client = new Client[100];
+	_allcount = 0;
 }
 
 Server::~Server()
@@ -51,12 +51,12 @@ void	Server::parseport(char *port)
 void	Server::structinit()
 {
 	_infos.ai_family = AF_INET;
-    _infos.ai_socktype = SOCK_STREAM;
-    _infos.ai_flags = AI_PASSIVE;
-    _infos.ai_protocol = 0;
-    _infos.ai_canonname = NULL;
-    _infos.ai_addr = NULL;
-    _infos.ai_next = NULL;
+	_infos.ai_socktype = SOCK_STREAM;
+	_infos.ai_flags = AI_PASSIVE;
+	_infos.ai_protocol = 0;
+	_infos.ai_canonname = NULL;
+	_infos.ai_addr = NULL;
+	_infos.ai_next = NULL;
 	if (getaddrinfo(NULL, _port.c_str(), &_infos, &_res) != 0)
 		throw getaddrException();
 }
@@ -77,59 +77,69 @@ void	Server::serverinit()
 	std::cout << "Now listening on port : " + _port << std::endl;
 }
 
+void	Server::newconnection(int *max)
+{
+	Client	newone;
+
+	newone.setFd(accept(getFd(), &newone.getAddr(), &newone.getLen()));
+	if (newone.getFd() > *max)
+		*max = newone.getFd();
+	newone.setUser(_allcount++);
+	FD_SET(newone.getFd(), &_master);
+	std::cout << "New connection " << newone.getUser() << std::endl;
+	_client.push_back(newone);
+	_nbclient++;
+}
+
+void	Server::dataReception(std::list<Client>::iterator it)
+{
+	char			buff[10];
+	int				ret;
+
+	bzero(buff, 10);
+	ret = 1;
+	if (FD_ISSET(it->getFd(), &_watchlist))
+	{
+		ret = recv(it->getFd(), buff, 10, 0);
+		if (ret == 0)
+		{
+			std::cout << "Client disconnected !" << std::endl;
+			FD_CLR(it->getFd(), &_master);
+			_client.erase(it);
+			_nbclient--;
+		}
+		else if (ret == -1)
+			std::cout << "Error" << std::endl;
+		else
+		{
+			std::cout << "User " << it->getUser() << " : " << buff << std::endl;
+		}
+	}
+}
+
 void	Server::routine()
 {
 	struct timeval	tv;
-	int				b;
 	int				max;
-	int				ret;
-	char			buff[10];
-	fd_set			master;
-	fd_set			watchlist;
+	std::list<Client>::iterator		it;
+	std::list<Client>::iterator		ite;
 
 	tv.tv_sec = 2;
 	tv.tv_usec = 500000;
-	FD_ZERO(&master);
-	FD_ZERO(&watchlist);
-	FD_SET(getFd(), &master);
+	FD_ZERO(&_master);
+	FD_ZERO(&_watchlist);
+	FD_SET(getFd(), &_master);
 	max = getFd();
-	bzero(buff, 10);
-	ret = 1;
 	while (1)
 	{
-		watchlist = master;
-		select(max + 1, &watchlist, NULL, NULL, &tv);
-		if (FD_ISSET(getFd(), &watchlist))
-		{
-			_client[_nbclient].setFd(accept(getFd(), &_client[_nbclient].getAddr(), &_client[_nbclient].getLen()));
-			if (_client[_nbclient].getFd() > max)
-				max = _client[_nbclient].getFd();
-			FD_SET(_client[_nbclient].getFd(), &master);
-			std::cout << "New connection " << _nbclient + 1 << std::endl;
-			_nbclient++;
-		}
-		b = 0;
-		while (b < _nbclient)
-		{
-			if (FD_ISSET(_client[b].getFd(), &watchlist))
-			{
-				ret = recv(_client[b].getFd(), buff, 10, 0);
-				if (ret == 0)
-				{
-					std::cout << "Client disconnected !" << std::endl;
-					FD_CLR(_client[b].getFd(), &master);
-				}
-				else if (ret == -1)
-					std::cout << "Error" << std::endl;
-				else
-				{
-					//buff[ret] = '\0';
-					std::cout << buff << std::endl;
-					bzero(buff, 10);
-				}
-			}
-			b++;
-		}
+		_watchlist = _master;
+		select(max + 1, &_watchlist, NULL, NULL, NULL);
+		if (FD_ISSET(getFd(), &_watchlist))
+			newconnection(&max);
+		it = _client.begin();
+		ite = _client.end();
+		while (it != ite)
+			dataReception(it++);
 	}
 }
 
