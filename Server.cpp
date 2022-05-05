@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/04 19:38:24 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/05 16:57:41 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ Server::Server(std::string port, std::string pass)
 	_port = port;
 	_pass = pass;
 	_nbclient = 0;
+	_client = new Client[100];
 }
 
 Server::~Server()
@@ -74,6 +75,62 @@ void	Server::serverinit()
 	if (listen(_fd, BACKLOG) == -1)
 		throw ListenException();
 	std::cout << "Now listening on port : " + _port << std::endl;
+}
+
+void	Server::routine()
+{
+	struct timeval	tv;
+	int				b;
+	int				max;
+	int				ret;
+	char			buff[10];
+	fd_set			master;
+	fd_set			watchlist;
+
+	tv.tv_sec = 2;
+	tv.tv_usec = 500000;
+	FD_ZERO(&master);
+	FD_ZERO(&watchlist);
+	FD_SET(getFd(), &master);
+	max = getFd();
+	bzero(buff, 10);
+	ret = 1;
+	while (1)
+	{
+		watchlist = master;
+		select(max + 1, &watchlist, NULL, NULL, &tv);
+		if (FD_ISSET(getFd(), &watchlist))
+		{
+			_client[_nbclient].setFd(accept(getFd(), &_client[_nbclient].getAddr(), &_client[_nbclient].getLen()));
+			if (_client[_nbclient].getFd() > max)
+				max = _client[_nbclient].getFd();
+			FD_SET(_client[_nbclient].getFd(), &master);
+			std::cout << "New connection " << _nbclient + 1 << std::endl;
+			_nbclient++;
+		}
+		b = 0;
+		while (b < _nbclient)
+		{
+			if (FD_ISSET(_client[b].getFd(), &watchlist))
+			{
+				ret = recv(_client[b].getFd(), buff, 10, 0);
+				if (ret == 0)
+				{
+					std::cout << "Client disconnected !" << std::endl;
+					FD_CLR(_client[b].getFd(), &master);
+				}
+				else if (ret == -1)
+					std::cout << "Error" << std::endl;
+				else
+				{
+					//buff[ret] = '\0';
+					std::cout << buff << std::endl;
+					bzero(buff, 10);
+				}
+			}
+			b++;
+		}
+	}
 }
 
 const char	*Server::InvalidPortException::what() const throw()
