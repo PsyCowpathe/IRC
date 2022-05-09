@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/05 19:33:50 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/09 20:41:57 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,16 +41,17 @@ class	Server
 		void				newconnection(int *max);
 		void				moov_back(const int b);
 		void				dataReception(std::list<Client>::iterator it);
+		int					cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key);
 
 	public :
 		Server(std::string port, std::string pass);
 		~Server();
 
-		int		getFd() const;
-		void	parseport(char *port);
-		void	structinit();
-		void	serverinit();
-		void	routine();
+		int					getFd() const;
+		void				parseport(char *port);
+		void				structinit();
+		void				serverinit();
+		void				routine();
 
 		class	InvalidPortException : public std::exception
 		{

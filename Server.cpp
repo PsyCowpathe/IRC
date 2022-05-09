@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/05 19:33:57 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/09 20:41:53 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,30 @@ void	Server::serverinit()
 	std::cout << "Now listening on port : " + _port << std::endl;
 }
 
+int		Server::cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key)
+{
+	std::string							str;
+	size_t								ret;
+	size_t								pos;
+
+	str = buff;
+	pos = key.size();
+	if ((ret = str.find(key, 0)) != std::string::npos)
+	{
+		while (pos < str.size())
+		{
+			pos = str.find_first_not_of(" ", pos);
+			ret = str.find(" ", pos);
+			if (ret == std::string::npos)
+				ret = str.size();
+			tab->push_back(str.substr(pos, ret - pos));
+			pos += tab->rbegin()->size();
+		}
+		return (1);
+	}
+	return (0);
+}
+
 void	Server::newconnection(int *max)
 {
 	Client	newone;
@@ -93,14 +117,16 @@ void	Server::newconnection(int *max)
 
 void	Server::dataReception(std::list<Client>::iterator it)
 {
-	char			buff[10];
-	int				ret;
+	int						buff_size = 100;
+	char					buff[buff_size];
+	int						ret;
+	std::list<std::string>	tab;
 
-	bzero(buff, 10);
+	bzero(buff, buff_size);
 	ret = 1;
 	if (FD_ISSET(it->getFd(), &_watchlist))
 	{
-		ret = recv(it->getFd(), buff, 10, 0);
+		ret = recv(it->getFd(), buff, buff_size, 0);
 		if (ret == 0)
 		{
 			std::cout << "Client disconnected !" << std::endl;
@@ -112,7 +138,26 @@ void	Server::dataReception(std::list<Client>::iterator it)
 			std::cout << "Error" << std::endl;
 		else
 		{
-			std::cout << "User " << it->getUser() << " : " << buff << std::endl;
+			if (buff[ret - 2] == 13)
+				buff[ret -2] = '\0';
+			if (ret == buff_size)
+				buff[ret] = '\0';
+			else
+				buff[ret - 1] = '\0';
+			if (it->getGranteed() == false)
+			{
+				if (cutdeBuff(&tab, buff, "PASS") == 1)
+				{
+					if (tab.begin()->compare(_pass) == 0)
+						it->setGranteed(1);
+					else
+						std::cout << "BAD" << std::endl;
+				}
+			}
+			else
+			{
+				//traite les commandes etc
+			}
 		}
 	}
 }
