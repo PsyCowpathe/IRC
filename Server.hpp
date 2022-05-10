@@ -28,6 +28,7 @@
 # define RPL_WELCOME(nickname) (SERVERNAMEHEAD + " 001 " + nickname + " Hi " + nickname + ", welcome to this awesome IRC server !" + "\r\n")
 # define RPL_INCORRECTPASS (SERVERNAMEHEAD + " 464 "  "Incorrect password !" + "\r\n")
 # define RPL_INCORRECTNICK (SERVERNAMEHEAD + " 464 "  "Incorrect nickname arguments !" + "\r\n")
+# define RPL_DUPLICATENICK (SERVERNAMEHEAD + " 433 "  "Error nickname already in use !" + "\r\n")
 # define RPL_INCORRECTUSER (SERVERNAMEHEAD + " 464 "  "Incorrect user arguments !" + "\r\n")
 
 
@@ -50,6 +51,7 @@ class	Server
 		int					cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key);
 		void				authentication(std::list<Client>::iterator it, char *buff);
 		void				sendMessage(int fd, const std::string msg);
+		int					isDuplicate(std::list<Client> lst, std::string str, std::string (Client::*fct)(void) const);
 
 	public :
 		Server(std::string port, std::string pass);
