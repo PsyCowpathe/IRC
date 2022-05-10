@@ -49,6 +49,7 @@ void	Server::parseport(char *port)
 
 void	Server::structinit()
 {
+	memset(&_infos, 0, sizeof(_infos)); //for windows
 	_infos.ai_family = AF_INET;
 	_infos.ai_socktype = SOCK_STREAM;
 	_infos.ai_flags = AI_PASSIVE;
@@ -56,8 +57,11 @@ void	Server::structinit()
 	_infos.ai_canonname = NULL;
 	_infos.ai_addr = NULL;
 	_infos.ai_next = NULL;
-	if (getaddrinfo(NULL, _port.c_str(), &_infos, &_res) != 0)
+	if (getaddrinfo("127.0.0.1", _port.c_str(), &_infos, &_res) != 0)
+	{
+		std::cout << strerror(errno) << std::endl;
 		throw getaddrException();
+	}
 }
 
 void	Server::serverinit()
@@ -117,6 +121,22 @@ void	Server::sendMessage(int fd, std::string msg)
 	send(fd, msg.c_str(), msg.size(), 0);
 }
 
+int		Server::isDuplicate(std::list<Client> lst, std::string str, std::string (Client::*fct)(void) const)
+{
+	std::list<Client>::iterator		it;
+	std::list<Client>::iterator		ite;
+
+	it = lst.begin();
+	ite = lst.end();
+	while (it != ite)
+	{
+		if (((*it).*fct)() == str)
+			return (1);
+		it++;
+	}
+	return (0);
+}
+
 void	Server::authentication(std::list<Client>::iterator it, char *buff)
 {
 	std::list<std::string>	tab;
@@ -138,6 +158,8 @@ void	Server::authentication(std::list<Client>::iterator it, char *buff)
 		{
 			if (tab.size() < 1)
 				sendMessage(it->getFd(), RPL_INCORRECTNICK);
+			else if (isDuplicate(_client, *tab.begin(), &Client::getNick) == 1)
+				sendMessage(it->getFd(), RPL_DUPLICATENICK);
 			else
 			{
 				std::list<std::string>::iterator	itt;
@@ -152,7 +174,7 @@ void	Server::authentication(std::list<Client>::iterator it, char *buff)
 	{
 		if (cutdeBuff(&tab, buff, "USER") == 1)
 		{
-			if (tab.size() < 1)
+			if (tab.size() < 4)
 				sendMessage(it->getFd(), RPL_INCORRECTUSER);
 			else
 			{
