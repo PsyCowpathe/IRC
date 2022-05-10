@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/09 20:41:57 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/10 18:48:13 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,15 @@ class	Server
 		struct addrinfo		_infos;
 		struct addrinfo		*_res;
 		int					_nbclient;
-		int					_allcount;
 		std::list<Client>	_client;
 		fd_set          	_master;
 		fd_set				_watchlist;
-
 
 		void				newconnection(int *max);
 		void				moov_back(const int b);
 		void				dataReception(std::list<Client>::iterator it);
 		int					cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key);
+		void				authentication(std::list<Client>::iterator it, char *buff);
 
 	public :
 		Server(std::string port, std::string pass);
