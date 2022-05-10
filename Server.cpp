@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/09 20:41:53 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/10 18:48:15 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ Server::Server(std::string port, std::string pass)
 	_port = port;
 	_pass = pass;
 	_nbclient = 0;
-	_allcount = 0;
 }
 
 Server::~Server()
@@ -108,11 +107,70 @@ void	Server::newconnection(int *max)
 	newone.setFd(accept(getFd(), &newone.getAddr(), &newone.getLen()));
 	if (newone.getFd() > *max)
 		*max = newone.getFd();
-	newone.setUser(_allcount++);
 	FD_SET(newone.getFd(), &_master);
-	std::cout << "New connection " << newone.getUser() << std::endl;
 	_client.push_back(newone);
 	_nbclient++;
+}
+
+void	Server::authentication(std::list<Client>::iterator it, char *buff)
+{
+	std::list<std::string>	tab;
+
+	if (it->getGranteed() == false)
+	{
+		if (cutdeBuff(&tab, buff, "PASS") == 1)
+		{
+			if (tab.begin()->compare(_pass) == 0)
+			{
+				it->setGranteed(1);
+			}
+			else
+				;//refuse connection
+		}
+		tab.clear();
+	}
+	else if (it->getNicked() == false)
+	{
+		if (cutdeBuff(&tab, buff, "NICK") == 1)
+		{
+			std::list<std::string>::iterator	itt;
+			itt = tab.begin();
+			it->setNick(*itt);
+			it->setNicked(1);
+		}
+		tab.clear();
+	}
+	else if (it->getUsered() == false)
+	{
+		if (cutdeBuff(&tab, buff, "USER") == 1)
+		{
+			std::list<std::string>::iterator	itt;
+			itt = tab.begin();
+			it->setUser(*itt);
+			itt++;
+			itt++;
+			itt++;
+			it->setReal(*itt);
+			it->setUsered(1);
+		}
+		tab.clear();
+	}
+	if (it->getGranteed() == true && it->getNicked() == true && it->getUsered() == true)
+	{
+		//:server 001 <nick> :Welcome to the <network> Network, <nick>
+		char	welcome[] = ":SERVER 001 agirona:Welcome to the NTM Network, agirona[!agirona@127.0.0.1]\r\n";
+		send(it->getFd(), welcome, strlen(welcome), 0);
+
+		char	welcome1[] = ":SERVER 002 agirona :Your host is NTM2, running version 10.10.10\r\n";
+		send(it->getFd(), welcome1, strlen(welcome1), 0);
+
+		char	welcome2[] = ":SERVER 003 agirona :This server was created 15/07/1998\r\n";
+		send(it->getFd(), welcome2, strlen(welcome2), 0);
+
+		char	welcome3[] =  ":SERVER 004 agirona NTM2 10.10.10 o + [<channel modes with a parameter>]\r\n";
+		send(it->getFd(), welcome3, strlen(welcome3), 0);
+		it->setRegistered(1);
+	}
 }
 
 void	Server::dataReception(std::list<Client>::iterator it)
@@ -120,7 +178,6 @@ void	Server::dataReception(std::list<Client>::iterator it)
 	int						buff_size = 100;
 	char					buff[buff_size];
 	int						ret;
-	std::list<std::string>	tab;
 
 	bzero(buff, buff_size);
 	ret = 1;
@@ -139,25 +196,14 @@ void	Server::dataReception(std::list<Client>::iterator it)
 		else
 		{
 			if (buff[ret - 2] == 13)
-				buff[ret -2] = '\0';
+				buff[ret - 2] = '\0';
 			if (ret == buff_size)
 				buff[ret] = '\0';
 			else
 				buff[ret - 1] = '\0';
-			if (it->getGranteed() == false)
-			{
-				if (cutdeBuff(&tab, buff, "PASS") == 1)
-				{
-					if (tab.begin()->compare(_pass) == 0)
-						it->setGranteed(1);
-					else
-						std::cout << "BAD" << std::endl;
-				}
-			}
-			else
-			{
-				//traite les commandes etc
-			}
+			std::cout << "Buff = " << buff << std::endl;
+			if (it->getRegistered() == false)
+				authentication(it, buff);
 		}
 	}
 }
