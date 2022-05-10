@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/10 18:48:13 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/10 20:43:54 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,14 @@
 # include <list>
 
 # define BACKLOG 10
+# define SERVERNAME "IRC42"
+# define SERVERNAMEHEAD (static_cast<std::string>(":") + static_cast<std::string>(SERVERNAME))
+
+# define RPL_WELCOME(nickname) (SERVERNAMEHEAD + " 001 " + nickname + " Hi " + nickname + ", welcome to this awesome IRC server !" + "\r\n")
+# define RPL_INCORRECTPASS (SERVERNAMEHEAD + " 464 "  "Incorrect password !" + "\r\n")
+# define RPL_INCORRECTNICK (SERVERNAMEHEAD + " 464 "  "Incorrect nickname arguments !" + "\r\n")
+# define RPL_INCORRECTUSER (SERVERNAMEHEAD + " 464 "  "Incorrect user arguments !" + "\r\n")
+
 
 class	Server
 {
@@ -41,6 +49,7 @@ class	Server
 		void				dataReception(std::list<Client>::iterator it);
 		int					cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key);
 		void				authentication(std::list<Client>::iterator it, char *buff);
+		void				sendMessage(int fd, const std::string msg);
 
 	public :
 		Server(std::string port, std::string pass);

@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/10 18:48:15 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/10 20:43:56 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,11 @@ void	Server::newconnection(int *max)
 	_nbclient++;
 }
 
+void	Server::sendMessage(int fd, std::string msg)
+{
+	send(fd, msg.c_str(), msg.size(), 0);
+}
+
 void	Server::authentication(std::list<Client>::iterator it, char *buff)
 {
 	std::list<std::string>	tab;
@@ -121,11 +126,9 @@ void	Server::authentication(std::list<Client>::iterator it, char *buff)
 		if (cutdeBuff(&tab, buff, "PASS") == 1)
 		{
 			if (tab.begin()->compare(_pass) == 0)
-			{
 				it->setGranteed(1);
-			}
 			else
-				;//refuse connection
+				sendMessage(it->getFd(), RPL_INCORRECTPASS);
 		}
 		tab.clear();
 	}
@@ -133,10 +136,15 @@ void	Server::authentication(std::list<Client>::iterator it, char *buff)
 	{
 		if (cutdeBuff(&tab, buff, "NICK") == 1)
 		{
-			std::list<std::string>::iterator	itt;
-			itt = tab.begin();
-			it->setNick(*itt);
-			it->setNicked(1);
+			if (tab.size() < 1)
+				sendMessage(it->getFd(), RPL_INCORRECTNICK);
+			else
+			{
+				std::list<std::string>::iterator	itt;
+				itt = tab.begin();
+				it->setNick(*itt);
+				it->setNicked(1);
+			}
 		}
 		tab.clear();
 	}
@@ -144,31 +152,28 @@ void	Server::authentication(std::list<Client>::iterator it, char *buff)
 	{
 		if (cutdeBuff(&tab, buff, "USER") == 1)
 		{
-			std::list<std::string>::iterator	itt;
-			itt = tab.begin();
-			it->setUser(*itt);
-			itt++;
-			itt++;
-			itt++;
-			it->setReal(*itt);
-			it->setUsered(1);
+			if (tab.size() < 1)
+				sendMessage(it->getFd(), RPL_INCORRECTUSER);
+			else
+			{
+				std::list<std::string>::iterator	itt;
+				itt = tab.begin();
+				it->setUser(*itt);
+				itt++;
+				itt++;
+				itt++;
+				it->setReal(*itt);
+				it->setUsered(1);
+			}
 		}
 		tab.clear();
 	}
 	if (it->getGranteed() == true && it->getNicked() == true && it->getUsered() == true)
 	{
-		//:server 001 <nick> :Welcome to the <network> Network, <nick>
-		char	welcome[] = ":SERVER 001 agirona:Welcome to the NTM Network, agirona[!agirona@127.0.0.1]\r\n";
-		send(it->getFd(), welcome, strlen(welcome), 0);
-
-		char	welcome1[] = ":SERVER 002 agirona :Your host is NTM2, running version 10.10.10\r\n";
-		send(it->getFd(), welcome1, strlen(welcome1), 0);
-
-		char	welcome2[] = ":SERVER 003 agirona :This server was created 15/07/1998\r\n";
-		send(it->getFd(), welcome2, strlen(welcome2), 0);
-
-		char	welcome3[] =  ":SERVER 004 agirona NTM2 10.10.10 o + [<channel modes with a parameter>]\r\n";
-		send(it->getFd(), welcome3, strlen(welcome3), 0);
+		sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));
+		/*sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));
+		sendMessage(it->getFd(), RPL_WELCOME(it->getUser())); continue greeting
+		sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));*/
 		it->setRegistered(1);
 	}
 }
