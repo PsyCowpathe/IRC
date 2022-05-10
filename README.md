@@ -1,7 +1,8 @@
 # IRC
 Internet Relay Chat
 
-#WEECHAT\n
+#WEECHAT
+
 /connect <servername> <ip/port> -password=<password>
 
 #NC
