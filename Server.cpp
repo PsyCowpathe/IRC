@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/09 20:41:53 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/10 20:43:56 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ Server::Server(std::string port, std::string pass)
 	_port = port;
 	_pass = pass;
 	_nbclient = 0;
-	_allcount = 0;
 }
 
 Server::~Server()
@@ -108,11 +107,75 @@ void	Server::newconnection(int *max)
 	newone.setFd(accept(getFd(), &newone.getAddr(), &newone.getLen()));
 	if (newone.getFd() > *max)
 		*max = newone.getFd();
-	newone.setUser(_allcount++);
 	FD_SET(newone.getFd(), &_master);
-	std::cout << "New connection " << newone.getUser() << std::endl;
 	_client.push_back(newone);
 	_nbclient++;
+}
+
+void	Server::sendMessage(int fd, std::string msg)
+{
+	send(fd, msg.c_str(), msg.size(), 0);
+}
+
+void	Server::authentication(std::list<Client>::iterator it, char *buff)
+{
+	std::list<std::string>	tab;
+
+	if (it->getGranteed() == false)
+	{
+		if (cutdeBuff(&tab, buff, "PASS") == 1)
+		{
+			if (tab.begin()->compare(_pass) == 0)
+				it->setGranteed(1);
+			else
+				sendMessage(it->getFd(), RPL_INCORRECTPASS);
+		}
+		tab.clear();
+	}
+	else if (it->getNicked() == false)
+	{
+		if (cutdeBuff(&tab, buff, "NICK") == 1)
+		{
+			if (tab.size() < 1)
+				sendMessage(it->getFd(), RPL_INCORRECTNICK);
+			else
+			{
+				std::list<std::string>::iterator	itt;
+				itt = tab.begin();
+				it->setNick(*itt);
+				it->setNicked(1);
+			}
+		}
+		tab.clear();
+	}
+	else if (it->getUsered() == false)
+	{
+		if (cutdeBuff(&tab, buff, "USER") == 1)
+		{
+			if (tab.size() < 1)
+				sendMessage(it->getFd(), RPL_INCORRECTUSER);
+			else
+			{
+				std::list<std::string>::iterator	itt;
+				itt = tab.begin();
+				it->setUser(*itt);
+				itt++;
+				itt++;
+				itt++;
+				it->setReal(*itt);
+				it->setUsered(1);
+			}
+		}
+		tab.clear();
+	}
+	if (it->getGranteed() == true && it->getNicked() == true && it->getUsered() == true)
+	{
+		sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));
+		/*sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));
+		sendMessage(it->getFd(), RPL_WELCOME(it->getUser())); continue greeting
+		sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));*/
+		it->setRegistered(1);
+	}
 }
 
 void	Server::dataReception(std::list<Client>::iterator it)
@@ -120,7 +183,6 @@ void	Server::dataReception(std::list<Client>::iterator it)
 	int						buff_size = 100;
 	char					buff[buff_size];
 	int						ret;
-	std::list<std::string>	tab;
 
 	bzero(buff, buff_size);
 	ret = 1;
@@ -139,25 +201,14 @@ void	Server::dataReception(std::list<Client>::iterator it)
 		else
 		{
 			if (buff[ret - 2] == 13)
-				buff[ret -2] = '\0';
+				buff[ret - 2] = '\0';
 			if (ret == buff_size)
 				buff[ret] = '\0';
 			else
 				buff[ret - 1] = '\0';
-			if (it->getGranteed() == false)
-			{
-				if (cutdeBuff(&tab, buff, "PASS") == 1)
-				{
-					if (tab.begin()->compare(_pass) == 0)
-						it->setGranteed(1);
-					else
-						std::cout << "BAD" << std::endl;
-				}
-			}
-			else
-			{
-				//traite les commandes etc
-			}
+			std::cout << "Buff = " << buff << std::endl;
+			if (it->getRegistered() == false)
+				authentication(it, buff);
 		}
 	}
 }
