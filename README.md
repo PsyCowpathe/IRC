@@ -6,6 +6,6 @@ Internet Relay Chat
 /connect <servername> <ip/port> -password=<password>
 
 #NC
-PASS <password>
+PASS \<password\>
 NICK <nickname>
 USER <username> <mode> <unused> <real name>
