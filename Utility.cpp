@@ -17,6 +17,24 @@ void	Server::sendMessage(int fd, std::string msg)
 	send(fd, msg.c_str(), msg.size(), 0);
 }
 
+int     Server::newMax()
+{
+    int                             max;
+    std::list<Client>::iterator     it;
+    std::list<Client>::iterator     ite;
+
+    max = _fd;
+    it = _client.begin();
+    ite = _client.end();
+    while (it != ite)
+    {
+        if (it->getFd() > max)
+            max = it->getFd();
+        it++;
+    }
+    return (max);
+}
+
 int		Server::isDuplicate(std::list<Client> lst, std::string str, std::string (Client::*fct)(void) const)
 {
 	std::list<Client>::iterator		it;
@@ -56,4 +74,3 @@ int		Server::cutdeBuff(std::list<std::string> *tab, const char *buff, const std:
 	}
 	return (0);
 }
-

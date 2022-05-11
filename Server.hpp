@@ -22,10 +22,16 @@
 # include <list>
 
 # define BACKLOG 10
-# define SERVERNAME "IRC42"
+# define SERVERNAME "God himself"
+# define VERSION "1.0"
+# define CREATED "10/05/2022 04:20"
 # define SERVERNAMEHEAD (static_cast<std::string>(":") + static_cast<std::string>(SERVERNAME))
 
-# define RPL_WELCOME(nickname) (SERVERNAMEHEAD + " 001 " + nickname + " Hi " + nickname + ", welcome to this awesome IRC server !" + "\r\n")
+# define RPL_WELCOME(nickname) (nickname + " 001 " + "Hi " + nickname + ", welcome to this awesome IRC server !" + "\r\n")
+# define RPL_YOURHOST(nickname) (nickname + " 002 " + "Your host is " + SERVERNAME + "running version " + VERSION + "\r\n")
+# define RPL_CREATED(nickname) (nickname + " 003 " + "This server was created " + CREATED + "\r\n")
+# define RPL_MYINFO(nickname) (nickname + " 004 " + nickname + SERVERNAME + VERSION + "none" + "none." + "\r\n")
+ 
 # define RPL_INCORRECTPASS (SERVERNAMEHEAD + " 464 "  "Incorrect password !" + "\r\n")
 # define RPL_INCORRECTNICK (SERVERNAMEHEAD + " 464 "  "Incorrect nickname arguments !" + "\r\n")
 # define RPL_DUPLICATENICK (SERVERNAMEHEAD + " 433 "  "Error nickname already in use !" + "\r\n")
@@ -46,8 +52,8 @@ class	Server
 		fd_set				_watchlist;
 
 		void				newconnection(int *max);
-		void				moov_back(const int b);
-		void				dataReception(std::list<Client>::iterator it);
+		int					newMax();
+		void				dataReception(int *max, std::list<Client>::iterator it);
 		int					cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key);
 		void				authentication(std::list<Client>::iterator it, char *buff);
 		void				sendMessage(int fd, const std::string msg);

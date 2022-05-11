@@ -65,12 +65,13 @@ void	Server::newconnection(int *max)
 	newone.setFd(accept(_fd, &newone.getAddr(), &newone.getLen()));
 	if (newone.getFd() > *max)
 		*max = newone.getFd();
+	std::cout << "user = " << newone.getFd() << std::endl;
 	FD_SET(newone.getFd(), &_master);
 	_client.push_back(newone);
 	_nbclient++;
 }
 
-void	Server::dataReception(std::list<Client>::iterator it)
+void	Server::dataReception(int *max, std::list<Client>::iterator it)
 {
 	int						buff_size = 100;
 	char					buff[buff_size];
@@ -81,15 +82,18 @@ void	Server::dataReception(std::list<Client>::iterator it)
 	if (FD_ISSET(it->getFd(), &_watchlist))
 	{
 		ret = recv(it->getFd(), buff, buff_size, 0);
-		if (ret == 0)
+		if (ret == 0 || ret == -1)
 		{
-			std::cout << "Client disconnected !" << std::endl;
+			if (ret == 0)
+				std::cout << "Client disconnected !" << std::endl;
+			else
+				std::cout << "Connection reset by client !" << std::endl;
 			FD_CLR(it->getFd(), &_master);
+			if (it->getFd() == *max)
+				*max = newMax();
 			_client.erase(it);
 			_nbclient--;
 		}
-		else if (ret == -1)
-			std::cout << "Error" << std::endl;
 		else
 		{
 			if (buff[ret - 2] == 13)
@@ -109,6 +113,7 @@ void	Server::routine()
 {
 	struct timeval					tv;
 	int								max;
+	int								ret;
 	std::list<Client>::iterator		it;
 	std::list<Client>::iterator		ite;
 
@@ -121,12 +126,14 @@ void	Server::routine()
 	while (1)
 	{
 		_watchlist = _master;
-		select(max + 1, &_watchlist, NULL, NULL, NULL);
+		ret = select(max + 1, &_watchlist, NULL, NULL, NULL);
+		if (ret == -1)
+			;//exception !!
 		if (FD_ISSET(_fd, &_watchlist))
 			newconnection(&max);
 		it = _client.begin();
 		ite = _client.end();
 		while (it != ite)
-			dataReception(it++);
+			dataReception(&max, it++);
 	}
 }
