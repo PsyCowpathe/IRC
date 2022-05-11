@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:52:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/11 20:43:56 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/11 20:30:32 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,8 @@ int		Server::cutdeBuff(std::list<std::string> *tab, const char *buff, const std:
 		while (pos < str.size())
 		{
 			pos = str.find_first_not_of(" ", pos);
+			if (pos == std::string::npos)
+				break;
 			ret = str.find(" ", pos);
 			if (ret == std::string::npos)
 				ret = str.size();

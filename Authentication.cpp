@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/11 20:43:54 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/11 17:32:07 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,12 @@ void	Server::grant(std::list<Client>::iterator it, char *buff)
 	{
 		if (cutdeBuff(&tab, buff, "PASS") == 1)
 		{
-			//NEED empty pass "" verification and no arg verification
-			if (tab.begin()->compare(_pass) == 0)
-				it->setGranteed(1);
+			if (tab.empty() == true || tab.size() < 1)
+				sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("PASS"));
+			else if (tab.begin()->compare(_pass) != 0)
+				sendMessage(it->getFd(), ERR_PASSWDMISMATCH);
 			else
-				sendMessage(it->getFd(), RPL_INCORRECTPASS);
+				it->setGranteed(1);
 		}
 		tab.clear();
 	}
@@ -36,11 +37,10 @@ void	Server::nick(std::list<Client>::iterator it, char *buff)
 
 	if (cutdeBuff(&tab, buff, "NICK") == 1)
 	{
-		//need empty argument "" verification
 		if (tab.empty() == true || tab.size() < 1)
-			sendMessage(it->getFd(), RPL_INCORRECTNICK);
+			sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("NICK"));
 		else if (isDuplicate(_client, *tab.begin(), &Client::getNick) == 1)
-			sendMessage(it->getFd(), RPL_DUPLICATENICK);
+			sendMessage(it->getFd(), ERR_NICKNAMEINUSE(*tab.begin()));
 		else
 		{
 			std::list<std::string>::iterator	itt;
@@ -59,11 +59,13 @@ void	Server::user(std::list<Client>::iterator it, char *buff)
 	if (cutdeBuff(&tab, buff, "USER") == 1)
 	{
 		if (tab.empty() == true || tab.size() < 4)
-			sendMessage(it->getFd(), RPL_INCORRECTUSER);
+			sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("USER"));
 		else
 		{
 			std::list<std::string>::iterator	itt;
 			itt = tab.begin();
+			if ((*tab.begin()).size() > PSEUDOLEN)
+				(*itt).resize(20);
 			it->setUser(*itt);
 			itt++;
 			itt++;
