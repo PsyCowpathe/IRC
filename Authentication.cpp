@@ -20,6 +20,7 @@ void	Server::grant(std::list<Client>::iterator it, char *buff)
 	{
 		if (cutdeBuff(&tab, buff, "PASS") == 1)
 		{
+			//NEED empty pass "" verification and no arg verification
 			if (tab.begin()->compare(_pass) == 0)
 				it->setGranteed(1);
 			else
@@ -35,7 +36,8 @@ void	Server::nick(std::list<Client>::iterator it, char *buff)
 
 	if (cutdeBuff(&tab, buff, "NICK") == 1)
 	{
-		if (tab.size() < 1)
+		//need empty argument "" verification
+		if (tab.empty() == true || tab.size() < 1)
 			sendMessage(it->getFd(), RPL_INCORRECTNICK);
 		else if (isDuplicate(_client, *tab.begin(), &Client::getNick) == 1)
 			sendMessage(it->getFd(), RPL_DUPLICATENICK);
@@ -56,7 +58,7 @@ void	Server::user(std::list<Client>::iterator it, char *buff)
 
 	if (cutdeBuff(&tab, buff, "USER") == 1)
 	{
-		if (tab.size() < 4)
+		if (tab.empty() == true || tab.size() < 4)
 			sendMessage(it->getFd(), RPL_INCORRECTUSER);
 		else
 		{
@@ -84,9 +86,9 @@ void	Server::authentication(std::list<Client>::iterator it, char *buff)
 	if (it->getGranteed() == true && it->getNicked() == true && it->getUsered() == true)
 	{
 		sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));
-		/*sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));
-		sendMessage(it->getFd(), RPL_WELCOME(it->getUser())); continue greeting
-		sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));*/
+		sendMessage(it->getFd(), RPL_YOURHOST(it->getUser()));
+		sendMessage(it->getFd(), RPL_CREATED(it->getUser()));
+		sendMessage(it->getFd(), RPL_MYINFO(it->getUser()));
 		it->setRegistered(1);
 	}
 }
