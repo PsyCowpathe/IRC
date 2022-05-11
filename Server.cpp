@@ -25,28 +25,6 @@ Server::~Server()
 	std::cout << "Server destructed !" << std::endl;
 }
 
-int		Server::getFd() const
-{
-	return (_fd);
-}
-
-void	Server::parseport(char *port)
-{			
-	std::string tmp = port;
-	int		nb;
-
-	if (tmp.empty() == true)
-		throw PortFormatException();
-	for (size_t i = 0; i < tmp.size(); i++)
-	{
-		if (!(isdigit(port[i])))
-			throw PortFormatException();
-	}
-	nb = atoi(port);
-	if (nb < 0 || nb > 65535) 
-		throw InvalidPortException();
-}
-
 void	Server::structinit()
 {
 	memset(&_infos, 0, sizeof(_infos)); //for windows
@@ -80,124 +58,16 @@ void	Server::serverinit()
 	std::cout << "Now listening on port : " + _port << std::endl;
 }
 
-int		Server::cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key)
-{
-	std::string							str;
-	size_t								ret;
-	size_t								pos;
-
-	str = buff;
-	pos = key.size();
-	if ((ret = str.find(key, 0)) != std::string::npos)
-	{
-		while (pos < str.size())
-		{
-			pos = str.find_first_not_of(" ", pos);
-			ret = str.find(" ", pos);
-			if (ret == std::string::npos)
-				ret = str.size();
-			tab->push_back(str.substr(pos, ret - pos));
-			pos += tab->rbegin()->size();
-		}
-		return (1);
-	}
-	return (0);
-}
-
 void	Server::newconnection(int *max)
 {
 	Client	newone;
 
-	newone.setFd(accept(getFd(), &newone.getAddr(), &newone.getLen()));
+	newone.setFd(accept(_fd, &newone.getAddr(), &newone.getLen()));
 	if (newone.getFd() > *max)
 		*max = newone.getFd();
 	FD_SET(newone.getFd(), &_master);
 	_client.push_back(newone);
 	_nbclient++;
-}
-
-void	Server::sendMessage(int fd, std::string msg)
-{
-	send(fd, msg.c_str(), msg.size(), 0);
-}
-
-int		Server::isDuplicate(std::list<Client> lst, std::string str, std::string (Client::*fct)(void) const)
-{
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
-
-	it = lst.begin();
-	ite = lst.end();
-	while (it != ite)
-	{
-		if (((*it).*fct)() == str)
-			return (1);
-		it++;
-	}
-	return (0);
-}
-
-void	Server::authentication(std::list<Client>::iterator it, char *buff)
-{
-	std::list<std::string>	tab;
-
-	if (it->getGranteed() == false)
-	{
-		if (cutdeBuff(&tab, buff, "PASS") == 1)
-		{
-			if (tab.begin()->compare(_pass) == 0)
-				it->setGranteed(1);
-			else
-				sendMessage(it->getFd(), RPL_INCORRECTPASS);
-		}
-		tab.clear();
-	}
-	else if (it->getNicked() == false)
-	{
-		if (cutdeBuff(&tab, buff, "NICK") == 1)
-		{
-			if (tab.size() < 1)
-				sendMessage(it->getFd(), RPL_INCORRECTNICK);
-			else if (isDuplicate(_client, *tab.begin(), &Client::getNick) == 1)
-				sendMessage(it->getFd(), RPL_DUPLICATENICK);
-			else
-			{
-				std::list<std::string>::iterator	itt;
-				itt = tab.begin();
-				it->setNick(*itt);
-				it->setNicked(1);
-			}
-		}
-		tab.clear();
-	}
-	else if (it->getUsered() == false)
-	{
-		if (cutdeBuff(&tab, buff, "USER") == 1)
-		{
-			if (tab.size() < 4)
-				sendMessage(it->getFd(), RPL_INCORRECTUSER);
-			else
-			{
-				std::list<std::string>::iterator	itt;
-				itt = tab.begin();
-				it->setUser(*itt);
-				itt++;
-				itt++;
-				itt++;
-				it->setReal(*itt);
-				it->setUsered(1);
-			}
-		}
-		tab.clear();
-	}
-	if (it->getGranteed() == true && it->getNicked() == true && it->getUsered() == true)
-	{
-		sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));
-		/*sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));
-		sendMessage(it->getFd(), RPL_WELCOME(it->getUser())); continue greeting
-		sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));*/
-		it->setRegistered(1);
-	}
 }
 
 void	Server::dataReception(std::list<Client>::iterator it)
@@ -237,8 +107,8 @@ void	Server::dataReception(std::list<Client>::iterator it)
 
 void	Server::routine()
 {
-	struct timeval	tv;
-	int				max;
+	struct timeval					tv;
+	int								max;
 	std::list<Client>::iterator		it;
 	std::list<Client>::iterator		ite;
 
@@ -246,52 +116,17 @@ void	Server::routine()
 	tv.tv_usec = 500000;
 	FD_ZERO(&_master);
 	FD_ZERO(&_watchlist);
-	FD_SET(getFd(), &_master);
-	max = getFd();
+	FD_SET(_fd, &_master);
+	max = _fd;
 	while (1)
 	{
 		_watchlist = _master;
 		select(max + 1, &_watchlist, NULL, NULL, NULL);
-		if (FD_ISSET(getFd(), &_watchlist))
+		if (FD_ISSET(_fd, &_watchlist))
 			newconnection(&max);
 		it = _client.begin();
 		ite = _client.end();
 		while (it != ite)
 			dataReception(it++);
 	}
-}
-
-const char	*Server::InvalidPortException::what() const throw()
-{
-	return ("The port must be between 0 and 65535 !");
-}
-
-const char	*Server::PortFormatException::what() const throw()
-{
-	return ("The port can't be empty and must be composed of positive digits !");
-}
-
-const char	*Server::getaddrException::what() const throw()
-{
-	return ("Error while geting the address info !");
-}
-
-const char	*Server::SocketCreationException::what() const throw()
-{
-	return ("Error while creating the server's socket !");
-}
-
-const char	*Server::SocketOptionException::what() const throw()
-{
-	return ("Error while setting the socket's option !");
-}
-
-const char	*Server::BindException::what() const throw()
-{
-	return ("Error while binding the server on a port !");
-}
-
-const char	*Server::ListenException::what() const throw()
-{
-	return ("Error while listening !");
 }

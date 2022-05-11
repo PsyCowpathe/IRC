@@ -13,13 +13,30 @@
 #include "Server.hpp"
 #include "Client.hpp"
 
+void	parseport(char *port)
+{			
+	std::string tmp = port;
+	int		nb;
+
+	if (tmp.empty() == true)
+		std::cout << "The port can't be empty and must be composed of positive digits !" << std::endl;
+	for (size_t i = 0; i < tmp.size(); i++)
+	{
+		if (!(isdigit(port[i])))
+			std::cout << "The port can't be empty and must be composed of positive digits !" << std::endl;
+	}
+	nb = atoi(port);
+	if (nb < 0 || nb > 65535)
+	std::cout << "The port must be between 0 and 65535 !" << std::endl;
+}
+
 void	irc(char *port, char *pass)
 {
 	Server	server(port, pass);
 
 	try
 	{
-		server.parseport(port);
+		parseport(port);
 		server.structinit();
 		server.serverinit();
 		server.routine();
