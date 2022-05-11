@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/10 20:43:54 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/11 20:30:37 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define	SERVER_HPP
 
 # include "Client.hpp"
+# include "Channel.hpp"
 # include <iostream>
 # include <netdb.h>
 # include <sys/types.h>
@@ -22,20 +23,20 @@
 # include <list>
 
 # define BACKLOG 10
-# define SERVERNAME "God himself"
+# define PSEUDOLEN 20
+# define SERVERNAME "God_himself"
 # define VERSION "1.0"
 # define CREATED "10/05/2022 04:20"
 # define SERVERNAMEHEAD (static_cast<std::string>(":") + static_cast<std::string>(SERVERNAME))
 
-# define RPL_WELCOME(nickname) (nickname + " 001 " + "Hi " + nickname + ", welcome to this awesome IRC server !" + "\r\n")
-# define RPL_YOURHOST(nickname) (nickname + " 002 " + "Your host is " + SERVERNAME + "running version " + VERSION + "\r\n")
-# define RPL_CREATED(nickname) (nickname + " 003 " + "This server was created " + CREATED + "\r\n")
-# define RPL_MYINFO(nickname) (nickname + " 004 " + nickname + SERVERNAME + VERSION + "none" + "none." + "\r\n")
+# define RPL_WELCOME(nickname) (SERVERNAMEHEAD + " 001 " + nickname + "Hi ! Welcome to this awesome IRC server !" + "\r\n")
+# define RPL_YOURHOST(nickname) (SERVERNAMEHEAD + " 002 " + "Your host is " + SERVERNAME + " running version " + VERSION + "\r\n")
+# define RPL_CREATED(nickname) (SERVERNAMEHEAD + " 003 " + "This server was created " + CREATED + "\r\n")
+# define RPL_MYINFO(nickname) (SERVERNAMEHEAD + " 004 " + nickname + " " + SERVERNAME + " " + VERSION + " none " + "none." + "\r\n")
  
-# define RPL_INCORRECTPASS (SERVERNAMEHEAD + " 464 "  "Incorrect password !" + "\r\n")
-# define RPL_INCORRECTNICK (SERVERNAMEHEAD + " 464 "  "Incorrect nickname arguments !" + "\r\n")
-# define RPL_DUPLICATENICK (SERVERNAMEHEAD + " 433 "  "Error nickname already in use !" + "\r\n")
-# define RPL_INCORRECTUSER (SERVERNAMEHEAD + " 464 "  "Incorrect user arguments !" + "\r\n")
+# define ERR_PASSWDMISMATCH (SERVERNAMEHEAD + " 464 " + "Incorrect password !" + "\r\n")
+# define ERR_NEEDMOREPARAMS(command) (SERVERNAMEHEAD + " 461 " + command " :Not enough parameters" + "\r\n")
+# define ERR_NICKNAMEINUSE(nick) (SERVERNAMEHEAD + " 433 " + nick + " :Nickname is already in use" + "\r\n")
 
 
 class	Server
@@ -48,8 +49,14 @@ class	Server
 		struct addrinfo		*_res;
 		int					_nbclient;
 		std::list<Client>	_client;
+		std::list<Channel>	_chan;
 		fd_set          	_master;
 		fd_set				_watchlist;
+		int					_nbcommand;
+
+		static std::string	commandList[];
+		static void			(Server::*commandFct[])(void);
+		void				Join();
 
 		void				newconnection(int *max);
 		int					newMax();
@@ -61,6 +68,7 @@ class	Server
 		void				grant(std::list<Client>::iterator it, char *buff);
 		void				nick(std::list<Client>::iterator it, char *buff);
 		void				user(std::list<Client>::iterator it, char *buff);
+		void				detectCommand(std::list<Client>::iterator it, char *buff);
 
 	public :
 		Server(std::string port, std::string pass);
@@ -91,6 +99,11 @@ class	Server
 				virtual const char	*what() const throw();
 		};
 		class	ListenException : public std::exception
+		{
+			public :
+				virtual const char	*what() const throw();
+		};
+		class	SelectException : public std::exception
 		{
 			public :
 				virtual const char	*what() const throw();

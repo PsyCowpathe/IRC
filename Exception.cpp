@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/11 20:43:54 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/11 17:37:53 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,4 +35,9 @@ const char	*Server::BindException::what() const throw()
 const char	*Server::ListenException::what() const throw()
 {
 	return ("Error while listening !");
+}
+
+const char	*Server::SelectException::what() const throw()
+{
+	return ("Error while waiting for fd activity !");
 }

@@ -6,13 +6,14 @@
 #    By: agirona <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/04 18:15:54 by agirona           #+#    #+#              #
-#    Updated: 2022/05/04 19:34:56 by agirona          ###   ########lyon.fr    #
+#    Updated: 2022/05/11 20:28:39 by agirona          ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = Server
 
-SRC = main.cpp Server.cpp Client.cpp
+SRC = main.cpp Server.cpp Client.cpp Authentication.cpp Utility.cpp Exception.cpp \
+	  Channel.cpp
 
 PATH = .
 

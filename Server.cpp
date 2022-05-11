@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/10 20:43:56 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/11 20:30:31 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,11 @@
 Server::Server(std::string port, std::string pass)
 {
 	std::cout << "Server created !" << std::endl;
+
 	_port = port;
 	_pass = pass;
 	_nbclient = 0;
+	_nbcommand = 1;
 }
 
 Server::~Server()
@@ -71,6 +73,21 @@ void	Server::newconnection(int *max)
 	_nbclient++;
 }
 
+void	Server::detectCommand(std::list<Client>::iterator it, char *buff)
+{
+	int		i;
+	std::list<std::string>	tab;
+
+	(void)it;
+	i = 0;
+	while (i < _nbcommand)
+	{
+		if (cutdeBuff(&tab, buff, commandList[i]) == 1)
+			(this->*commandFct[i])();
+		i++;
+	}
+}
+
 void	Server::dataReception(int *max, std::list<Client>::iterator it)
 {
 	int						buff_size = 100;
@@ -105,6 +122,8 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 			std::cout << "Buff = " << buff << std::endl;
 			if (it->getRegistered() == false)
 				authentication(it, buff);
+			else
+				detectCommand(it, buff);
 		}
 	}
 }
@@ -128,7 +147,7 @@ void	Server::routine()
 		_watchlist = _master;
 		ret = select(max + 1, &_watchlist, NULL, NULL, NULL);
 		if (ret == -1)
-			;//exception !!
+			throw SelectException();
 		if (FD_ISSET(_fd, &_watchlist))
 			newconnection(&max);
 		it = _client.begin();
@@ -136,4 +155,19 @@ void	Server::routine()
 		while (it != ite)
 			dataReception(&max, it++);
 	}
+}
+
+std::string     Server::commandList[] =
+{
+    "JOIN",
+};
+
+void    (Server::*(Server::commandFct)[])(void) =
+{
+	&Server::Join,
+};
+
+void	Server::Join()
+{
+	std::cout << "JOIN" << std::endl;
 }
