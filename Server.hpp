@@ -52,27 +52,18 @@ class	Server
 		void				authentication(std::list<Client>::iterator it, char *buff);
 		void				sendMessage(int fd, const std::string msg);
 		int					isDuplicate(std::list<Client> lst, std::string str, std::string (Client::*fct)(void) const);
+		void				grant(std::list<Client>::iterator it, char *buff);
+		void				nick(std::list<Client>::iterator it, char *buff);
+		void				user(std::list<Client>::iterator it, char *buff);
 
 	public :
 		Server(std::string port, std::string pass);
 		~Server();
 
-		int					getFd() const;
-		void				parseport(char *port);
 		void				structinit();
 		void				serverinit();
 		void				routine();
 
-		class	InvalidPortException : public std::exception
-		{
-			public :
-				virtual const char	*what() const throw();
-		};
-		class	PortFormatException : public std::exception
-		{
-			public :
-				virtual const char	*what() const throw();
-		};
 		class	getaddrException : public std::exception
 		{
 			public :
