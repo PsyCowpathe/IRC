@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/11 17:32:07 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/13 18:02:43 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	Server::nick(std::list<Client>::iterator it, char *buff)
 	{
 		if (tab.empty() == true || tab.size() < 1)
 			sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("NICK"));
-		else if (isDuplicate(_client, *tab.begin(), &Client::getNick) == 1)
+		else if (findStr(_client, *tab.begin(), &Client::getNick) != _client.end())
 			sendMessage(it->getFd(), ERR_NICKNAMEINUSE(*tab.begin()));
 		else
 		{
@@ -91,6 +91,7 @@ void	Server::authentication(std::list<Client>::iterator it, char *buff)
 		sendMessage(it->getFd(), RPL_YOURHOST(it->getUser()));
 		sendMessage(it->getFd(), RPL_CREATED(it->getUser()));
 		sendMessage(it->getFd(), RPL_MYINFO(it->getUser()));
+		std::cout << "user = " << it->getNick() << " fd = " << it->getFd() << std::endl;
 		it->setRegistered(1);
 	}
 }

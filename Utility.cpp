@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:52:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/11 20:30:32 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/13 19:36:40 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int     Server::newMax()
     return (max);
 }
 
-int		Server::isDuplicate(std::list<Client> lst, std::string str, std::string (Client::*fct)(void) const)
+std::list<Client>::iterator	Server::findStr(std::list<Client> &lst, std::string str, std::string (Client::*fct)(void) const)
 {
 	std::list<Client>::iterator		it;
 	std::list<Client>::iterator		ite;
@@ -45,10 +45,10 @@ int		Server::isDuplicate(std::list<Client> lst, std::string str, std::string (Cl
 	while (it != ite)
 	{
 		if (((*it).*fct)() == str)
-			return (1);
+			return (it);
 		it++;
 	}
-	return (0);
+	return (_client.end());
 }
 
 int		Server::cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key)
@@ -56,21 +56,42 @@ int		Server::cutdeBuff(std::list<std::string> *tab, const char *buff, const std:
 	std::string							str;
 	size_t								ret;
 	size_t								pos;
+	size_t								point;
 
 	str = buff;
 	pos = key.size();
+	point = pos;
 	if ((ret = str.find(key, 0)) != std::string::npos)
 	{
 		while (pos < str.size())
 		{
 			pos = str.find_first_not_of(" ", pos);
-			if (pos == std::string::npos)
-				break;
-			ret = str.find(" ", pos);
-			if (ret == std::string::npos)
-				ret = str.size();
-			tab->push_back(str.substr(pos, ret - pos));
-			pos += tab->rbegin()->size();
+			point = str.find(":", point);
+			if (point == pos)
+			{
+				point = str.find(":", point + 1);
+				if (point != std::string::npos)
+				{
+					tab->push_back(str.substr(pos + 1, point - pos - 1));
+					pos = point + 1;
+				}
+				else
+				{
+					tab->push_back(str.substr(pos, str.size() - pos));
+					break ;
+				}
+				point++;
+			}
+			else
+			{
+				if (pos == std::string::npos)
+					break;
+				ret = str.find(" ", pos);
+				if (ret == std::string::npos)
+					ret = str.size();
+				tab->push_back(str.substr(pos, ret - pos));
+				pos += tab->rbegin()->size();
+			}
 		}
 		return (1);
 	}
