@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/11 20:30:37 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/13 18:13:16 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 # define CREATED "10/05/2022 04:20"
 # define SERVERNAMEHEAD (static_cast<std::string>(":") + static_cast<std::string>(SERVERNAME))
 
-# define RPL_WELCOME(nickname) (SERVERNAMEHEAD + " 001 " + nickname + "Hi ! Welcome to this awesome IRC server !" + "\r\n")
+# define RPL_WELCOME(nickname) (SERVERNAMEHEAD + " 001 " + nickname + " Hi ! Welcome to this awesome IRC server !" + "\r\n")
 # define RPL_YOURHOST(nickname) (SERVERNAMEHEAD + " 002 " + "Your host is " + SERVERNAME + " running version " + VERSION + "\r\n")
 # define RPL_CREATED(nickname) (SERVERNAMEHEAD + " 003 " + "This server was created " + CREATED + "\r\n")
 # define RPL_MYINFO(nickname) (SERVERNAMEHEAD + " 004 " + nickname + " " + SERVERNAME + " " + VERSION + " none " + "none." + "\r\n")
@@ -37,6 +37,10 @@
 # define ERR_PASSWDMISMATCH (SERVERNAMEHEAD + " 464 " + "Incorrect password !" + "\r\n")
 # define ERR_NEEDMOREPARAMS(command) (SERVERNAMEHEAD + " 461 " + command " :Not enough parameters" + "\r\n")
 # define ERR_NICKNAMEINUSE(nick) (SERVERNAMEHEAD + " 433 " + nick + " :Nickname is already in use" + "\r\n")
+# define ERR_NOSUCHNICK(nick) (SERVERNAMEHEAD + " 401 " + nick + " :No such nick/channel" + "\r\n")
+
+# define RPL_PRIVMSG(sender, receiver, msg) (":" + sender + " PRIVMSG " + receiver + " " + msg + "\r\n")
+# define RPL_PONG (SERVERNAMEHEAD + " PONG " + SERVERNAME + " " + SERVERNAMEHEAD + "\r\n")
 
 
 class	Server
@@ -55,8 +59,11 @@ class	Server
 		int					_nbcommand;
 
 		static std::string	commandList[];
-		static void			(Server::*commandFct[])(void);
-		void				Join();
+		static void			(Server::*commandFct[])(std::list<std::string> tab, std::list<Client>::iterator it);
+
+		void				Join(std::list<std::string> tab, std::list<Client>::iterator it);
+		void				privMsg(std::list<std::string> tab, std::list<Client>::iterator it);
+		void				Ping(std::list<std::string> tab, std::list<Client>::iterator it);
 
 		void				newconnection(int *max);
 		int					newMax();
@@ -64,7 +71,7 @@ class	Server
 		int					cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key);
 		void				authentication(std::list<Client>::iterator it, char *buff);
 		void				sendMessage(int fd, const std::string msg);
-		int					isDuplicate(std::list<Client> lst, std::string str, std::string (Client::*fct)(void) const);
+		std::list<Client>::iterator		findStr(std::list<Client> &lst, std::string str, std::string (Client::*fct)(void) const);
 		void				grant(std::list<Client>::iterator it, char *buff);
 		void				nick(std::list<Client>::iterator it, char *buff);
 		void				user(std::list<Client>::iterator it, char *buff);

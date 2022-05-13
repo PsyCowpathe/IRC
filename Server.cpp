@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/11 20:30:31 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/13 18:26:05 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Server::Server(std::string port, std::string pass)
 	_port = port;
 	_pass = pass;
 	_nbclient = 0;
-	_nbcommand = 1;
+	_nbcommand = 3;
 }
 
 Server::~Server()
@@ -67,26 +67,11 @@ void	Server::newconnection(int *max)
 	newone.setFd(accept(_fd, &newone.getAddr(), &newone.getLen()));
 	if (newone.getFd() > *max)
 		*max = newone.getFd();
-	std::cout << "user = " << newone.getFd() << std::endl;
 	FD_SET(newone.getFd(), &_master);
 	_client.push_back(newone);
 	_nbclient++;
 }
 
-void	Server::detectCommand(std::list<Client>::iterator it, char *buff)
-{
-	int		i;
-	std::list<std::string>	tab;
-
-	(void)it;
-	i = 0;
-	while (i < _nbcommand)
-	{
-		if (cutdeBuff(&tab, buff, commandList[i]) == 1)
-			(this->*commandFct[i])();
-		i++;
-	}
-}
 
 void	Server::dataReception(int *max, std::list<Client>::iterator it)
 {
@@ -157,17 +142,69 @@ void	Server::routine()
 	}
 }
 
+void	Server::detectCommand(std::list<Client>::iterator it, char *buff)
+{
+	int		i;
+	std::list<std::string>	tab;
+
+	(void)it;
+	i = 0;
+	while (i < _nbcommand)
+	{
+		if (cutdeBuff(&tab, buff, commandList[i]) == 1)
+		{
+			std::cout << "tabsize = " << tab.size() << std::endl;
+			(this->*commandFct[i])(tab, it);
+		}
+
+		i++;
+	}
+}
+
 std::string     Server::commandList[] =
 {
     "JOIN",
+	"PRIVMSG",
+	"PING",
 };
 
-void    (Server::*(Server::commandFct)[])(void) =
+void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<Client>::iterator it) =
 {
 	&Server::Join,
+	&Server::privMsg,
+	&Server::Ping,
 };
 
-void	Server::Join()
+void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator it)
 {
+	(void)it;
+	(void)tab;
 	std::cout << "JOIN" << std::endl;
+}
+
+void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator it)
+{
+	std::list<Client>::iterator			receiver;
+	std::list<std::string>::iterator	tabit;
+	(void)it;
+	(void)tab;
+	tabit = tab.begin();
+	receiver = findStr(_client, *tabit, &Client::getNick);
+	if (receiver == _client.end())
+		sendMessage(it->getFd(), ERR_NOSUCHNICK(*tabit));
+	else
+	{
+		tabit++;
+		std::cout << "Send \"" << *tabit << "\" to " << receiver->getNick() << std::endl;
+		std::cout << "fd = " << receiver->getFd() << std::endl;
+		sendMessage(receiver->getFd(), RPL_PRIVMSG(it->getNick(), receiver->getNick(), *tabit));
+	}
+
+}
+
+void	Server::Ping(std::list<std::string> tab, std::list<Client>::iterator it)
+{
+	(void)tab;
+	std::cout << "PONG" << std::endl;
+	sendMessage(it->getFd(), RPL_PONG);
 }
