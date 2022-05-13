@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 19:24:34 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/10 18:48:16 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/13 20:36:49 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,4 +112,17 @@ std::string		Client::getReal() const
 	return (_realname);
 }
 
+void			Client::setBuff(const std::string value)
+{
+	_buff = _buff + value;
+}
 
+std::string		Client::getBuff() const
+{
+	return (_buff);
+}
+
+void			Client::eraseBuff(int start, int len)
+{
+	_buff.erase(start, len);
+}

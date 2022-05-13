@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/13 18:13:16 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/13 20:36:52 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,14 +68,14 @@ class	Server
 		void				newconnection(int *max);
 		int					newMax();
 		void				dataReception(int *max, std::list<Client>::iterator it);
-		int					cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key);
-		void				authentication(std::list<Client>::iterator it, char *buff);
+		int					cutdeBuff(std::list<std::string> *tab, const std::string &buff, const std::string key);
+		void				authentication(std::list<Client>::iterator it, const std::string &buff);
 		void				sendMessage(int fd, const std::string msg);
 		std::list<Client>::iterator		findStr(std::list<Client> &lst, std::string str, std::string (Client::*fct)(void) const);
-		void				grant(std::list<Client>::iterator it, char *buff);
-		void				nick(std::list<Client>::iterator it, char *buff);
-		void				user(std::list<Client>::iterator it, char *buff);
-		void				detectCommand(std::list<Client>::iterator it, char *buff);
+		void				grant(std::list<Client>::iterator it, const std::string &buff);
+		void				nick(std::list<Client>::iterator it, const std::string &buff);
+		void				user(std::list<Client>::iterator it, const std::string &buff);
+		void				detectCommand(std::list<Client>::iterator it, const std::string &buff);
 
 	public :
 		Server(std::string port, std::string pass);
