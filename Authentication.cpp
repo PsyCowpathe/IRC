@@ -6,13 +6,13 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/13 18:02:43 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/13 20:36:48 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-void	Server::grant(std::list<Client>::iterator it, char *buff)
+void	Server::grant(std::list<Client>::iterator it, const std::string &buff)
 {
 	std::list<std::string>	tab;
 
@@ -31,7 +31,7 @@ void	Server::grant(std::list<Client>::iterator it, char *buff)
 	}
 }
 
-void	Server::nick(std::list<Client>::iterator it, char *buff)
+void	Server::nick(std::list<Client>::iterator it, const std::string &buff)
 {
 	std::list<std::string>	tab;
 
@@ -52,7 +52,7 @@ void	Server::nick(std::list<Client>::iterator it, char *buff)
 	tab.clear();
 }
 
-void	Server::user(std::list<Client>::iterator it, char *buff)
+void	Server::user(std::list<Client>::iterator it, const std::string &buff)
 {
 	std::list<std::string>	tab;
 
@@ -77,7 +77,7 @@ void	Server::user(std::list<Client>::iterator it, char *buff)
 	}
 }
 
-void	Server::authentication(std::list<Client>::iterator it, char *buff)
+void	Server::authentication(std::list<Client>::iterator it, const std::string &buff)
 {
 	if (it->getGranteed() == false)
 		grant(it, buff);

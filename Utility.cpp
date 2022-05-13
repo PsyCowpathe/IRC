@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:52:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/13 19:36:40 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/13 20:36:47 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,13 +45,17 @@ std::list<Client>::iterator	Server::findStr(std::list<Client> &lst, std::string 
 	while (it != ite)
 	{
 		if (((*it).*fct)() == str)
+		{
+			std::cout << "J'ai trouver" << std::endl;
 			return (it);
+		}
 		it++;
 	}
+	std::cout << "J'ai po trouver" << std::endl;
 	return (_client.end());
 }
 
-int		Server::cutdeBuff(std::list<std::string> *tab, const char *buff, const std::string key)
+int		Server::cutdeBuff(std::list<std::string> *tab, const std::string &buff, const std::string key)
 {
 	std::string							str;
 	size_t								ret;

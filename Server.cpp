@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/13 18:26:05 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/13 20:36:46 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 	int						buff_size = 100;
 	char					buff[buff_size];
 	int						ret;
+	size_t					i;
+	std::string				tmp;
 
 	bzero(buff, buff_size);
 	ret = 1;
@@ -98,17 +100,18 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 		}
 		else
 		{
-			if (buff[ret - 2] == 13)
-				buff[ret - 2] = '\0';
-			if (ret == buff_size)
-				buff[ret] = '\0';
-			else
-				buff[ret - 1] = '\0';
-			std::cout << "Buff = " << buff << std::endl;
-			if (it->getRegistered() == false)
-				authentication(it, buff);
-			else
-				detectCommand(it, buff);
+			it->setBuff(buff);
+			std::cout << "buff = " << buff << std::endl;
+			if ((i = it->getBuff().find("\r\n", 0)) != std::string::npos)
+			{
+				tmp = it->getBuff().substr(0, i) + "\0";
+				it->eraseBuff(0, i + 2);
+				std::cout << "command = " << tmp << std::endl;
+				if (it->getRegistered() == false)
+					authentication(it, tmp);
+				else
+					detectCommand(it, tmp);
+			}
 		}
 	}
 }
@@ -142,7 +145,7 @@ void	Server::routine()
 	}
 }
 
-void	Server::detectCommand(std::list<Client>::iterator it, char *buff)
+void	Server::detectCommand(std::list<Client>::iterator it, const std::string &buff)
 {
 	int		i;
 	std::list<std::string>	tab;
@@ -152,10 +155,7 @@ void	Server::detectCommand(std::list<Client>::iterator it, char *buff)
 	while (i < _nbcommand)
 	{
 		if (cutdeBuff(&tab, buff, commandList[i]) == 1)
-		{
-			std::cout << "tabsize = " << tab.size() << std::endl;
 			(this->*commandFct[i])(tab, it);
-		}
 
 		i++;
 	}
