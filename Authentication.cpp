@@ -6,32 +6,31 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/13 20:36:48 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/17 18:16:20 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-void	Server::grant(std::list<Client>::iterator it, const std::string &buff)
+void	Server::authGrant(std::list<Client>::iterator it, const std::string &buff)
 {
 	std::list<std::string>	tab;
 
-	if (it->getGranteed() == false)
+	if (cutdeBuff(&tab, buff, "PASS") == 1)
 	{
-		if (cutdeBuff(&tab, buff, "PASS") == 1)
-		{
-			if (tab.empty() == true || tab.size() < 1)
-				sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("PASS"));
-			else if (tab.begin()->compare(_pass) != 0)
-				sendMessage(it->getFd(), ERR_PASSWDMISMATCH);
-			else
-				it->setGranteed(1);
-		}
-		tab.clear();
+		if (tab.empty() == true || tab.size() < 1)
+			sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("PASS"));
+		else if (tab.begin()->compare(_pass) != 0)
+			sendMessage(it->getFd(), ERR_PASSWDMISMATCH);
+		else
+			it->setGranteed(1);
 	}
+	else
+		sendMessage(it->getFd(), ERR_NEEDPASS);
+	tab.clear();
 }
 
-void	Server::nick(std::list<Client>::iterator it, const std::string &buff)
+void	Server::authNick(std::list<Client>::iterator it, const std::string &buff)
 {
 	std::list<std::string>	tab;
 
@@ -49,10 +48,12 @@ void	Server::nick(std::list<Client>::iterator it, const std::string &buff)
 			it->setNicked(1);
 		}
 	}
+	else
+		sendMessage(it->getFd(), ERR_NEEDNICK);
 	tab.clear();
 }
 
-void	Server::user(std::list<Client>::iterator it, const std::string &buff)
+void	Server::authUser(std::list<Client>::iterator it, const std::string &buff)
 {
 	std::list<std::string>	tab;
 
@@ -73,18 +74,20 @@ void	Server::user(std::list<Client>::iterator it, const std::string &buff)
 			it->setReal(*itt);
 			it->setUsered(1);
 		}
-		tab.clear();
 	}
+	else
+		sendMessage(it->getFd(), ERR_NEEDUSER);
+	tab.clear();
 }
 
 void	Server::authentication(std::list<Client>::iterator it, const std::string &buff)
 {
 	if (it->getGranteed() == false)
-		grant(it, buff);
+		authGrant(it, buff);
 	else if (it->getNicked() == false)
-		nick(it, buff);
+		authNick(it, buff);
 	else if (it->getUsered() == false)
-		user(it, buff);
+		authUser(it, buff);
 	if (it->getGranteed() == true && it->getNicked() == true && it->getUsered() == true)
 	{
 		sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));

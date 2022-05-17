@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/13 20:36:46 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/17 18:16:20 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Server::Server(std::string port, std::string pass)
 	_port = port;
 	_pass = pass;
 	_nbclient = 0;
-	_nbcommand = 3;
+	_nbcommand = 4;
 }
 
 Server::~Server()
@@ -106,7 +106,7 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 			{
 				tmp = it->getBuff().substr(0, i) + "\0";
 				it->eraseBuff(0, i + 2);
-				std::cout << "command = " << tmp << std::endl;
+				std::cout << "command = " << tmp << "|" << std::endl;
 				if (it->getRegistered() == false)
 					authentication(it, tmp);
 				else
@@ -148,24 +148,30 @@ void	Server::routine()
 void	Server::detectCommand(std::list<Client>::iterator it, const std::string &buff)
 {
 	int		i;
+	int		valid;
 	std::list<std::string>	tab;
 
-	(void)it;
 	i = 0;
+	valid = 0;
 	while (i < _nbcommand)
 	{
 		if (cutdeBuff(&tab, buff, commandList[i]) == 1)
+		{
+			valid = 1;
 			(this->*commandFct[i])(tab, it);
-
+		}
 		i++;
 	}
+	if (valid == 0)
+		sendMessage(it->getFd(), ERR_INVALIDCOMMAND);
 }
 
 std::string     Server::commandList[] =
 {
-    "JOIN",
+	"JOIN",
 	"PRIVMSG",
 	"PING",
+	"NICK",
 };
 
 void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<Client>::iterator it) =
@@ -173,6 +179,7 @@ void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<
 	&Server::Join,
 	&Server::privMsg,
 	&Server::Ping,
+	&Server::Nick,
 };
 
 void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator it)
@@ -186,8 +193,6 @@ void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator it)
 {
 	std::list<Client>::iterator			receiver;
 	std::list<std::string>::iterator	tabit;
-	(void)it;
-	(void)tab;
 	tabit = tab.begin();
 	receiver = findStr(_client, *tabit, &Client::getNick);
 	if (receiver == _client.end())
@@ -195,8 +200,8 @@ void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator it)
 	else
 	{
 		tabit++;
-		std::cout << "Send \"" << *tabit << "\" to " << receiver->getNick() << std::endl;
-		std::cout << "fd = " << receiver->getFd() << std::endl;
+		std::cout << it->getNick();
+		std::cout << " send --> \"" << *tabit << "\" to " << receiver->getNick() << std::endl;
 		sendMessage(receiver->getFd(), RPL_PRIVMSG(it->getNick(), receiver->getNick(), *tabit));
 	}
 
@@ -207,4 +212,19 @@ void	Server::Ping(std::list<std::string> tab, std::list<Client>::iterator it)
 	(void)tab;
 	std::cout << "PONG" << std::endl;
 	sendMessage(it->getFd(), RPL_PONG);
+}
+
+void	Server::Nick(std::list<std::string> tab, std::list<Client>::iterator it)
+{
+	std::cout << "NICK" << std::endl;
+	if (tab.empty() == true || tab.size() < 1)
+		sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("NICK"));
+	else if (findStr(_client, *tab.begin(), &Client::getNick) != _client.end())
+		sendMessage(it->getFd(), ERR_NICKNAMEINUSE(*tab.begin()));
+	else
+	{
+		std::cout << "User : " << it->getNick() << " is now called ";
+		it->setNick(*tab.begin());
+		std::cout << it->getNick() << std::endl;
+	}
 }

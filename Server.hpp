@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/13 20:36:52 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/17 18:16:23 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,10 @@
 # define ERR_NEEDMOREPARAMS(command) (SERVERNAMEHEAD + " 461 " + command " :Not enough parameters" + "\r\n")
 # define ERR_NICKNAMEINUSE(nick) (SERVERNAMEHEAD + " 433 " + nick + " :Nickname is already in use" + "\r\n")
 # define ERR_NOSUCHNICK(nick) (SERVERNAMEHEAD + " 401 " + nick + " :No such nick/channel" + "\r\n")
+# define ERR_NEEDPASS (SERVERNAMEHEAD + " 4001 " + "Please enter server password !" + "\r\n")
+# define ERR_NEEDNICK (SERVERNAMEHEAD + " 4002 " + "Please nick yourself !" + "\r\n")
+# define ERR_NEEDUSER (SERVERNAMEHEAD + " 4003 " + "Please give more info about you !" + "\r\n")
+# define ERR_INVALIDCOMMAND (SERVERNAMEHEAD + " 4004 " + "Command not found !" + "\r\n")
 
 # define RPL_PRIVMSG(sender, receiver, msg) (":" + sender + " PRIVMSG " + receiver + " " + msg + "\r\n")
 # define RPL_PONG (SERVERNAMEHEAD + " PONG " + SERVERNAME + " " + SERVERNAMEHEAD + "\r\n")
@@ -64,6 +68,7 @@ class	Server
 		void				Join(std::list<std::string> tab, std::list<Client>::iterator it);
 		void				privMsg(std::list<std::string> tab, std::list<Client>::iterator it);
 		void				Ping(std::list<std::string> tab, std::list<Client>::iterator it);
+		void				Nick(std::list<std::string> tab, std::list<Client>::iterator it);
 
 		void				newconnection(int *max);
 		int					newMax();
@@ -72,9 +77,9 @@ class	Server
 		void				authentication(std::list<Client>::iterator it, const std::string &buff);
 		void				sendMessage(int fd, const std::string msg);
 		std::list<Client>::iterator		findStr(std::list<Client> &lst, std::string str, std::string (Client::*fct)(void) const);
-		void				grant(std::list<Client>::iterator it, const std::string &buff);
-		void				nick(std::list<Client>::iterator it, const std::string &buff);
-		void				user(std::list<Client>::iterator it, const std::string &buff);
+		void				authGrant(std::list<Client>::iterator it, const std::string &buff);
+		void				authNick(std::list<Client>::iterator it, const std::string &buff);
+		void				authUser(std::list<Client>::iterator it, const std::string &buff);
 		void				detectCommand(std::list<Client>::iterator it, const std::string &buff);
 
 	public :
