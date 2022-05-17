@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/17 18:16:20 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/17 20:15:56 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Server::Server(std::string port, std::string pass)
 	_port = port;
 	_pass = pass;
 	_nbclient = 0;
-	_nbcommand = 4;
+	_nbcommand = 5;
 }
 
 Server::~Server()
@@ -172,6 +172,7 @@ std::string     Server::commandList[] =
 	"PRIVMSG",
 	"PING",
 	"NICK",
+	"USER",
 };
 
 void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<Client>::iterator it) =
@@ -180,6 +181,7 @@ void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<
 	&Server::privMsg,
 	&Server::Ping,
 	&Server::Nick,
+	&Server::User,
 };
 
 void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator it)
@@ -223,8 +225,21 @@ void	Server::Nick(std::list<std::string> tab, std::list<Client>::iterator it)
 		sendMessage(it->getFd(), ERR_NICKNAMEINUSE(*tab.begin()));
 	else
 	{
-		std::cout << "User : " << it->getNick() << " is now called ";
+		std::cout << "User : " << it->getNick() << " is now nicknamed ";
 		it->setNick(*tab.begin());
 		std::cout << it->getNick() << std::endl;
+	}
+}
+
+void	Server::User(std::list<std::string> tab, std::list<Client>::iterator it)
+{
+	std::cout << "USER" << std::endl;
+	if (tab.empty() == true || tab.size() < 1)
+		sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("USER"));
+	else
+	{
+		std::cout << "User : " << it->getUser() << " is now called ";
+		it->setUser(*tab.begin());
+		std::cout << it->getUser() << std::endl;
 	}
 }

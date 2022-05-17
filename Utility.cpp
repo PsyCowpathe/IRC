@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:52:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/17 18:16:15 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/17 20:15:55 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int		Server::cutdeBuff(std::list<std::string> *tab, const std::string &buff, con
 	point = pos;
 	if ((ret = str.find(key, 0)) != std::string::npos && ret == 0)
 	{
-		if (str[ret + key.size()] != ' ')
+		if (str[ret + key.size()] != ' ' && str[ret + key.size()] != '\0')
 			return (0);
 		while (pos < str.size())
 		{

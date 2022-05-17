@@ -5,6 +5,18 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/05/17 19:06:37 by agirona           #+#    #+#             */
+/*   Updated: 2022/05/17 20:15:52 by agirona          ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
 /*   Updated: 2022/05/17 18:16:23 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
@@ -69,6 +81,7 @@ class	Server
 		void				privMsg(std::list<std::string> tab, std::list<Client>::iterator it);
 		void				Ping(std::list<std::string> tab, std::list<Client>::iterator it);
 		void				Nick(std::list<std::string> tab, std::list<Client>::iterator it);
+		void				User(std::list<std::string> tab, std::list<Client>::iterator it);
 
 		void				newconnection(int *max);
 		int					newMax();
