@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:52:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/17 20:15:55 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/18 17:33:53 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,22 +37,6 @@ int     Server::newMax()
         it++;
     }
     return (max);
-}
-
-std::list<Client>::iterator	Server::findStr(std::list<Client> &lst, std::string str, std::string (Client::*fct)(void) const)
-{
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
-
-	it = lst.begin();
-	ite = lst.end();
-	while (it != ite)
-	{
-		if (((*it).*fct)() == str)
-			return (it);
-		it++;
-	}
-	return (_client.end());
 }
 
 int		Server::cutdeBuff(std::list<std::string> *tab, const std::string &buff, const std::string key)

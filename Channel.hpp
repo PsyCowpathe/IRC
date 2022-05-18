@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:57:13 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/17 20:15:51 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/18 19:54:39 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,17 @@
 # include <iostream>
 # include <list>
 # include "Client.hpp"
-
 class	Channel
 {
 	private :
 		std::list<Client>	_user;
 		std::list<Client>	_op;
+		std::list<Client>	_invite;
+		std::string			_name;
+		std::string			_topic;
 
 	public :
-		Channel(const Client &client);
+		Channel();
 		~Channel();
 
 		int		addUser(const Client &client);
@@ -34,6 +36,11 @@ class	Channel
 		std::list<Client>	getOp(void) const;
 		std::list<Client>	getUser(void) const;
 		std::list<Client>	getAllUser(void);
+		std::string			getName(void) const;
+		int					setName(const std::string name);
+		std::string			getTopic(void) const;
+		int					setTopic(const std::string name);
+		std::string			getUserList(void);
 };
 
 #endif

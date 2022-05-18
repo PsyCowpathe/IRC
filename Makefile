@@ -6,7 +6,7 @@
 #    By: agirona <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/04 18:15:54 by agirona           #+#    #+#              #
-#    Updated: 2022/05/11 20:28:39 by agirona          ###   ########lyon.fr    #
+#    Updated: 2022/05/18 16:26:14 by agirona          ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ SRC = main.cpp Server.cpp Client.cpp Authentication.cpp Utility.cpp Exception.cp
 
 PATH = .
 
-HEADER = Server.hpp Client.hpp
+HEADER = Server.hpp Client.hpp Channel.hpp
 
 OBJ = $(SRC:.cpp=.o)
 

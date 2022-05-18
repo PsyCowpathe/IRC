@@ -6,11 +6,12 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 19:24:34 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/17 18:16:16 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/18 17:33:50 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
+#include "Server.hpp"
 
 Client::Client()
 {
