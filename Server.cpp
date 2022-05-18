@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/17 20:15:56 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/18 19:54:35 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,11 +184,68 @@ void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<
 	&Server::User,
 };
 
+void	Server::msgAll(std::list<Client> &users, Client &sender, std::string &msg)
+{
+	std::list<Client>::iterator		it;
+	std::list<Client>::iterator		ite;
+
+	it = users.begin();
+	ite = users.end();
+	while (it != ite)
+	{
+		if (it->getNick() != sender.getNick())
+			sendMessage(it->getFd(), msg);
+		it++;
+	}
+}
+
 void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator it)
 {
 	(void)it;
 	(void)tab;
+	Channel		newone;
+
 	std::cout << "JOIN" << std::endl;
+	if (tab.empty() == true || tab.size() < 1)
+		sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("NICK"));
+	else if (findStr<std::list<Channel>, Channel>(_channel, *tab.begin(), &Channel::getName) != _channel.end())
+	{
+		std::list<Channel>::iterator		itt;
+		std::list<Channel>::iterator		itte;
+
+		itt = _channel.begin();
+		itte = _channel.end();
+		while (itt != itte)
+		{
+			if (itt->getName() == *tab.begin())
+			{
+				if (itt->addUser(*it) == 1)
+				{
+					sendMessage(it->getFd(), ERR_ALREADYJOIN);
+					return ;
+				}
+				sendMessage(it->getFd(), RPL_JOIN(it->getNick(), *tab.begin()));
+				sendMessage(it->getFd(), RPL_TOPIC(it->getNick(), *tab.begin(), itt->getTopic()));
+				sendMessage(it->getFd(), RPL_NAMREPLY(it->getNick(), *tab.begin(), itt->getUserList()));
+				std::cout << "User " << it->getNick() << " joined channel " << *tab.begin() << std::endl;
+				return ;
+			}
+		}
+	}
+	else
+	{
+		if (newone.setName(*tab.begin()) == 1)
+		{
+			sendMessage(it->getFd(), ERR_ERRONEUSCHANNAME(*tab.begin()));
+			return ;
+		}
+		newone.setName(*tab.begin());
+		newone.addOperator(*it);
+		sendMessage(it->getFd(), RPL_JOIN(it->getNick(), *tab.begin()));
+		sendMessage(it->getFd(), RPL_TOPIC(it->getNick(), *tab.begin(), newone.getTopic()));
+		sendMessage(it->getFd(), RPL_NAMREPLY(it->getNick(), *tab.begin(), newone.getUserList()));
+		_channel.push_back(newone);
+	}
 }
 
 void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator it)
@@ -196,7 +253,7 @@ void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator it)
 	std::list<Client>::iterator			receiver;
 	std::list<std::string>::iterator	tabit;
 	tabit = tab.begin();
-	receiver = findStr(_client, *tabit, &Client::getNick);
+	receiver = findStr<std::list<Client>, Client>(_client, *tabit, &Client::getNick);
 	if (receiver == _client.end())
 		sendMessage(it->getFd(), ERR_NOSUCHNICK(*tabit));
 	else
@@ -206,7 +263,6 @@ void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator it)
 		std::cout << " send --> \"" << *tabit << "\" to " << receiver->getNick() << std::endl;
 		sendMessage(receiver->getFd(), RPL_PRIVMSG(it->getNick(), receiver->getNick(), *tabit));
 	}
-
 }
 
 void	Server::Ping(std::list<std::string> tab, std::list<Client>::iterator it)
@@ -218,11 +274,14 @@ void	Server::Ping(std::list<std::string> tab, std::list<Client>::iterator it)
 
 void	Server::Nick(std::list<std::string> tab, std::list<Client>::iterator it)
 {
+	size_t	ret;
 	std::cout << "NICK" << std::endl;
 	if (tab.empty() == true || tab.size() < 1)
 		sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("NICK"));
-	else if (findStr(_client, *tab.begin(), &Client::getNick) != _client.end())
+	else if (findStr<std::list<Client>, Client>(_client, *tab.begin(), &Client::getNick) != _client.end())
 		sendMessage(it->getFd(), ERR_NICKNAMEINUSE(*tab.begin()));
+	else if ((ret = tab.begin()->find("#", 0)) == 0 || ret != std::string::npos)
+			sendMessage(it->getFd(), ERR_ERRONEUSNICKNAME(*tab.begin()));
 	else
 	{
 		std::cout << "User : " << it->getNick() << " is now nicknamed ";

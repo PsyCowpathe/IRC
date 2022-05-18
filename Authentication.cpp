@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/17 20:15:55 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/18 16:30:22 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,19 @@ void	Server::authGrant(std::list<Client>::iterator it, const std::string &buff)
 void	Server::authNick(std::list<Client>::iterator it, const std::string &buff)
 {
 	std::list<std::string>	tab;
+	size_t					ret;
+	// CAP LS 302
+	ret = -1;
 
 	if (cutdeBuff(&tab, buff, "NICK") == 1)
 	{
+		std::cout << "tab = " << *tab.begin() << std::endl;
 		if (tab.empty() == true || tab.size() < 1)
 			sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("NICK"));
-		else if (findStr(_client, *tab.begin(), &Client::getNick) != _client.end())
+		else if (findStr<std::list<Client>, Client>(_client, *tab.begin(), &Client::getNick) != _client.end())
 			sendMessage(it->getFd(), ERR_NICKNAMEINUSE(*tab.begin()));
+		else if ((ret = tab.begin()->find("#", 0)) == 0 || ret != std::string::npos)
+			sendMessage(it->getFd(), ERR_ERRONEUSNICKNAME(*tab.begin()));
 		else
 		{
 			std::list<std::string>::iterator	itt;
