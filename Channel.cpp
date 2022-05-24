@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:58:20 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/18 19:54:35 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/24 17:08:56 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 Channel::Channel()
 {
-	_topic = "Default topiccc.";
+	_topic = "Default topic.";
 	//_op.push_back(client);
 }
 
@@ -200,8 +200,8 @@ std::string		Channel::getUserList(void)
 	while (it != ite)
 	{
 		list = list + "@" + it->getNick();
-		if (++it != ite)
-			list + " ";
+		if (++it != ite || _user.empty() == false)
+			list = list + " ";
 	}
 	it = _user.begin();
 	ite = _user.end();
@@ -209,7 +209,7 @@ std::string		Channel::getUserList(void)
 	{
 		list = list + it->getNick();
 		if (++it != ite)
-			list + " ";
+			list = list + " ";
 	}
 	std::cout << "list = " << list << std::endl;
 	return (list);

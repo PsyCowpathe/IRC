@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/18 16:30:22 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/24 17:08:55 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ void	Server::authGrant(std::list<Client>::iterator it, const std::string &buff)
 		else
 			it->setGranteed(1);
 	}
-	else
-		sendMessage(it->getFd(), ERR_NEEDPASS);
+	//else
+	//	sendMessage(it->getFd(), ERR_NEEDPASS);
 	tab.clear();
 }
 
@@ -44,7 +44,7 @@ void	Server::authNick(std::list<Client>::iterator it, const std::string &buff)
 			sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("NICK"));
 		else if (findStr<std::list<Client>, Client>(_client, *tab.begin(), &Client::getNick) != _client.end())
 			sendMessage(it->getFd(), ERR_NICKNAMEINUSE(*tab.begin()));
-		else if ((ret = tab.begin()->find("#", 0)) == 0 || ret != std::string::npos)
+		else if ((ret = tab.begin()->find_first_of("@#", 0)) == 0 || ret != std::string::npos)
 			sendMessage(it->getFd(), ERR_ERRONEUSNICKNAME(*tab.begin()));
 		else
 		{
@@ -54,8 +54,8 @@ void	Server::authNick(std::list<Client>::iterator it, const std::string &buff)
 			it->setNicked(1);
 		}
 	}
-	else
-		sendMessage(it->getFd(), ERR_NEEDNICK);
+	//else
+	//	sendMessage(it->getFd(), ERR_NEEDNICK);
 	tab.clear();
 }
 
@@ -81,8 +81,8 @@ void	Server::authUser(std::list<Client>::iterator it, const std::string &buff)
 			it->setUsered(1);
 		}
 	}
-	else
-		sendMessage(it->getFd(), ERR_NEEDUSER);
+	//else
+	//	sendMessage(it->getFd(), ERR_NEEDUSER);
 	tab.clear();
 }
 
@@ -90,13 +90,14 @@ void	Server::authentication(std::list<Client>::iterator it, const std::string &b
 {
 	if (it->getGranteed() == false)
 		authGrant(it, buff);
-	else if (it->getNicked() == false)
+	if (it->getGranteed() == true &&  it->getNicked() == false)
 		authNick(it, buff);
-	else if (it->getUsered() == false)
+	if (it->getGranteed() == true && it->getUsered() == false)
 		authUser(it, buff);
 	if (it->getGranteed() == true && it->getNicked() == true && it->getUsered() == true)
 	{
-		sendMessage(it->getFd(), RPL_WELCOME(it->getUser()));
+		std::cout << RPL_WELCOME(it->getNick()) << std::endl;
+		sendMessage(it->getFd(), RPL_WELCOME(it->getNick()));
 		sendMessage(it->getFd(), RPL_YOURHOST(it->getUser()));
 		sendMessage(it->getFd(), RPL_CREATED(it->getUser()));
 		sendMessage(it->getFd(), RPL_MYINFO(it->getUser()));
