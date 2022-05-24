@@ -6,14 +6,15 @@
 #    By: agirona <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/04 18:15:54 by agirona           #+#    #+#              #
-#    Updated: 2022/05/24 21:26:39 by agirona          ###   ########lyon.fr    #
+#    Updated: 2022/05/24 22:20:03 by agirona          ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = Server
 
 SRC = main.cpp Server.cpp Client.cpp Authentication.cpp Utility.cpp Exception.cpp \
-	  Channel.cpp
+	  Channel.cpp InitServer.cpp Routine.cpp CommandList.cpp Join.cpp PrivMsg.cpp \
+	  Ping.cpp Nick.cpp User.cpp
 
 PATH = .
 
