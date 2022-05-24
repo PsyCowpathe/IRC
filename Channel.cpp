@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:58:20 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/24 17:08:56 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/24 22:09:52 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ int		Channel::addUser(const Client &client)
 		it++;
 	}
 	_user.push_back(client);
+	std::cout << "add = " << client.getNick() << std::endl;
 	return (0); //success
 }
 
@@ -95,6 +96,7 @@ int		Channel::addOperator(const Client &client)
 	if (it == ite)
 	{
 		_op.push_back(client);
+		std::cout << "add = " << client.getNick() << std::endl;
 		return (0); //success
 	}
 	while (it != ite)
@@ -102,6 +104,7 @@ int		Channel::addOperator(const Client &client)
 		if (it->getNick() == client.getNick())
 		{
 			_op.push_back(client);
+			std::cout << "add = " << client.getNick() << std::endl;
 			return (0); //success
 		}
 		it++;
@@ -141,7 +144,7 @@ std::list<Client> Channel::getUser(void) const
 
 std::list<Client> Channel::getAllUser(void)
 {
-	std::list<Client>				all;	
+	std::list<Client>				all;;
 	std::list<Client>::iterator		it;
 	std::list<Client>::iterator		ite;
 
@@ -149,6 +152,7 @@ std::list<Client> Channel::getAllUser(void)
 	ite = _op.end();
 	while (it != ite)
 	{
+		std::cout << "op = " << it->getNick() << std::endl;
 		all.push_back(*it);
 		it++;
 	}
@@ -156,9 +160,11 @@ std::list<Client> Channel::getAllUser(void)
 	ite = _user.end();
 	while (it != ite)
 	{
+		std::cout << "user = " << it->getNick() << std::endl;
 		all.push_back(*it);
 		it++;
 	}
+	std::cout << "finished" << std::endl;
 	return (all);
 }
 
@@ -211,6 +217,23 @@ std::string		Channel::getUserList(void)
 		if (++it != ite)
 			list = list + " ";
 	}
-	std::cout << "list = " << list << std::endl;
 	return (list);
+}
+
+int			Channel::isJoin(const std::string &nick)
+{
+	std::list<Client>			list;
+	std::list<Client>::iterator	it;
+	std::list<Client>::iterator	ite;
+
+	list = getAllUser();
+	it = list.begin();
+	ite = list.end();
+	while (it != ite)
+	{
+		if (it->getNick() == nick)
+			return (1);
+		it++;
+	}
+	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/24 17:08:50 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/24 22:09:57 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <sys/socket.h>
 # include <sys/select.h>
 # include <list>
+# include <unistd.h>
 
 # define BACKLOG 10
 # define PSEUDOLEN 20
@@ -44,14 +45,16 @@
 # define ERR_INVALIDCOMMAND (SERVERNAMEHEAD + " 4004 " + "Command not found !" + "\r\n")
 # define ERR_ERRONEUSNICKNAME(nick) (SERVERNAMEHEAD + " 432 " + nick + " :Erroneus nickname" + "\r\n")
 # define ERR_ERRONEUSCHANNAME(channame) (SERVERNAMEHEAD + " 4005 " + channame + " :The channel name must be precede by  '#' character" + "\r\n")
-# define ERR_ALREADYJOIN (SERVERNAMEHEAD + " 4005 " + " :Already join this channel !" + "\r\n")
+# define ERR_ALREADYJOIN (SERVERNAMEHEAD + " 4006 " + " :Already join this channel !" + "\r\n")
+# define ERR_CANNOTSENDTOCHAN(channame) (SERVERNAMEHEAD + " 404 " + channame + " :Cannot send to channel" + "\r\n")
+# define ERR_ALREADYREGISTERED (SERVERNAMEHEAD + " 462 " + " :You may not reregister !" + "\r\n")
 
 # define RPL_PRIVMSG(sender, receiver, msg) (":" + sender + " PRIVMSG " + receiver + " " + msg + "\r\n")
 # define RPL_PONG (SERVERNAMEHEAD + " PONG " + SERVERNAME + " " + SERVERNAMEHEAD + "\r\n")
 # define RPL_JOIN(nick, channame) (":" + nick + " JOIN " + channame + "\r\n")
 # define RPL_TOPIC(nick, channame, topic) (":" + nick + " 432 " + channame + " :" + topic + "\r\n")
 # define RPL_NAMREPLY(nick, channame, userlist) (SERVERNAMEHEAD + " 353 " + nick + " @ " + channame + " :" + userlist + "\r\n")
-
+# define RPL_EMPTYPART(nick, channame) (":" + nick + " PART " + channame + "\r\n")
 
 class	Server
 {
@@ -83,7 +86,7 @@ class	Server
 		int							cutdeBuff(std::list<std::string> *tab, const std::string &buff, const std::string key);
 		void						authentication(std::list<Client>::iterator it, const std::string &buff);
 		void						sendMessage(int fd, const std::string msg);
-		void						msgAll(std::list<Client> &users, Client &sender, std::string &msg);
+		void						msgAll(std::list<std::string> &args, Client &sender);
 		void						authGrant(std::list<Client>::iterator it, const std::string &buff);
 		void						authNick(std::list<Client>::iterator it, const std::string &buff);
 		void						authUser(std::list<Client>::iterator it, const std::string &buff);

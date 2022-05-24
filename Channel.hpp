@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:57:13 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/24 17:08:51 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/24 22:09:57 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class	Channel
 		std::string			getTopic(void) const;
 		int					setTopic(const std::string name);
 		std::string			getUserList(void);
+		int					isJoin(const std::string &nick);
 };
 
 #endif
