@@ -1,28 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
+/*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/04 17:54:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/24 22:20:02 by agirona          ###   ########lyon.fr   */
+/*   Created: 2022/05/24 22:18:24 by agirona           #+#    #+#             */
+/*   Updated: 2022/05/24 22:19:59 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include  "Server.hpp"
+#include "Server.hpp"
 
-Server::Server(std::string port, std::string pass)
+void	Server::User(std::list<std::string> tab, std::list<Client>::iterator it)
 {
-	std::cout << "Server created !" << std::endl;
-
-	_port = port;
-	_pass = pass;
-	_nbclient = 0;
-	_nbcommand = 6;
-}
-
-Server::~Server()
-{
-	std::cout << "Server destructed !" << std::endl;
+	(void)tab;
+	sendMessage(it->getFd(), ERR_ALREADYREGISTERED);
 }
