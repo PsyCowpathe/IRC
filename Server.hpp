@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/24 22:09:57 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/30 14:34:03 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@
 # define RPL_TOPIC(nick, channame, topic) (":" + nick + " 432 " + channame + " :" + topic + "\r\n")
 # define RPL_NAMREPLY(nick, channame, userlist) (SERVERNAMEHEAD + " 353 " + nick + " @ " + channame + " :" + userlist + "\r\n")
 # define RPL_EMPTYPART(nick, channame) (":" + nick + " PART " + channame + "\r\n")
+# define RPL_PART(nick, channame, msg) (":" + nick + " PART " + channame + (msg[0] == ':' ? " " : " :") + msg + "\r\n")
+# define RPL_QUIT(nick, channame, msg) (":" + nick + " PART " + channame + (msg[0] == ':' ? " " : " :") + msg + "\r\n")
 
 class	Server
 {
@@ -79,6 +81,7 @@ class	Server
 		void						Ping(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						Nick(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						User(std::list<std::string> tab, std::list<Client>::iterator it);
+		void						Part(std::list<std::string> tab, std::list<Client>::iterator it);
 
 		void						newconnection(int *max);
 		int							newMax();
