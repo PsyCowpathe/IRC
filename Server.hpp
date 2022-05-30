@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/30 14:34:03 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/30 20:42:04 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,10 @@
 # define ERR_ALREADYJOIN (SERVERNAMEHEAD + " 4006 " + " :Already join this channel !" + "\r\n")
 # define ERR_CANNOTSENDTOCHAN(channame) (SERVERNAMEHEAD + " 404 " + channame + " :Cannot send to channel" + "\r\n")
 # define ERR_ALREADYREGISTERED (SERVERNAMEHEAD + " 462 " + " :You may not reregister !" + "\r\n")
+# define ERR_NOSUCHCHANNEL(channame) (SERVERNAMEHEAD + " 403 " + channame + " :No such channel !" + "\r\n")
+# define ERR_NOTONCHANNEL(channame) (SERVERNAMEHEAD + " 442 " + channame + " :You are not on that channel !" + "\r\n")
+# define ERR_CHANOPPRIVSNEEDED(channame) (SERVERNAMEHEAD + " 482 " + channame + " :You are not channel operator !" + "\r\n")
+# define ERR_UNKNOWMODE(mode) (SERVERNAMEHEAD + " 472 " + mode + " :Is unknow mode to me !" + "\r\n")
 
 # define RPL_PRIVMSG(sender, receiver, msg) (":" + sender + " PRIVMSG " + receiver + " " + msg + "\r\n")
 # define RPL_PONG (SERVERNAMEHEAD + " PONG " + SERVERNAME + " " + SERVERNAMEHEAD + "\r\n")
@@ -56,7 +60,7 @@
 # define RPL_NAMREPLY(nick, channame, userlist) (SERVERNAMEHEAD + " 353 " + nick + " @ " + channame + " :" + userlist + "\r\n")
 # define RPL_EMPTYPART(nick, channame) (":" + nick + " PART " + channame + "\r\n")
 # define RPL_PART(nick, channame, msg) (":" + nick + " PART " + channame + (msg[0] == ':' ? " " : " :") + msg + "\r\n")
-# define RPL_QUIT(nick, channame, msg) (":" + nick + " PART " + channame + (msg[0] == ':' ? " " : " :") + msg + "\r\n")
+# define RPL_MODE(nick, channame, msg) (":" + nick + " MODE " + channame + " :" + mode  + "\r\n")
 
 class	Server
 {
@@ -82,11 +86,14 @@ class	Server
 		void						Nick(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						User(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						Part(std::list<std::string> tab, std::list<Client>::iterator it);
+		void						Mode(std::list<std::string> tab, std::list<Client>::iterator it);
 
 		void						newconnection(int *max);
 		int							newMax();
 		void						dataReception(int *max, std::list<Client>::iterator it);
 		int							cutdeBuff(std::list<std::string> *tab, const std::string &buff, const std::string key);
+		void						PartUpdate(std::list<Client>::iterator &sender, const std::list<Channel>::iterator &channel, const std::string &msg);
+		void						ModeUpdate(std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode);
 		void						authentication(std::list<Client>::iterator it, const std::string &buff);
 		void						sendMessage(int fd, const std::string msg);
 		void						msgAll(std::list<std::string> &args, Client &sender);
