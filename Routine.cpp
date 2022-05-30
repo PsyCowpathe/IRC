@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:13:07 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/24 22:16:12 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/30 14:33:59 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,20 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 				if (chanit->deleteUser(*it) == 0)
 				{
 					list = chanit->getAllUser();
-					update = list.begin();
-					endupdate = list.end();
-					while (update != endupdate)
+					if (list.size() == 0)
 					{
-						sendMessage(update->getFd(), RPL_EMPTYPART(it->getNick(), chanit->getName()));
-						update++;
+						_channel.erase(chanit);
+						std::cout << "Channel deleted" << std::endl;
+					}
+					else
+					{
+						update = list.begin();
+						endupdate = list.end();
+						while (update != endupdate)
+						{
+							sendMessage(update->getFd(), RPL_EMPTYPART(it->getNick(), chanit->getName()));
+							update++;
+						}
 					}
 				}
 				chanit++;
