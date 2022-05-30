@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:14:31 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/30 14:33:58 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/30 20:42:01 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,11 @@ std::string     Server::commandList[] =
 	"USER",
 	"PASS",
 	"PART",
+	"MODE",
+	//NOTICE,
+	//LIST
+	//NAME
+	//TOPIC
 };
 
 void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<Client>::iterator it) =
@@ -32,6 +37,7 @@ void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<
 	&Server::User,
 	&Server::User,
 	&Server::Part,
+	&Server::Mode,
 };
 
 void	Server::detectCommand(std::list<Client>::iterator it, const std::string &buff)

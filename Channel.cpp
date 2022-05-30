@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:58:20 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/30 14:33:58 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/05/30 20:42:02 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int		Channel::addUser(const Client &client)
 	return (0); //success
 }
 
-int		Channel::deleteUser(Client &client)
+int		Channel::deleteUser(const Client &client)
 {
 	std::list<Client>::iterator		it;
 	std::list<Client>::iterator		ite;
@@ -103,6 +103,7 @@ int		Channel::addOperator(const Client &client)
 	{
 		if (it->getNick() == client.getNick())
 		{
+			deleteUser(client);
 			_op.push_back(client);
 			std::cout << "add = " << client.getNick() << std::endl;
 			return (0); //success
@@ -227,6 +228,24 @@ int			Channel::isJoin(const std::string &nick)
 	std::list<Client>::iterator	ite;
 
 	list = getAllUser();
+	it = list.begin();
+	ite = list.end();
+	while (it != ite)
+	{
+		if (it->getNick() == nick)
+			return (1);
+		it++;
+	}
+	return (0);
+}
+
+int			Channel::isOp(const std::string &nick)
+{
+	std::list<Client>			list;
+	std::list<Client>::iterator	it;
+	std::list<Client>::iterator	ite;
+
+	list = getOp();
 	it = list.begin();
 	ite = list.end();
 	while (it != ite)
