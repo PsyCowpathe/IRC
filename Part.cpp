@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Part.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: cguiot <cguiot@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 13:50:33 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/30 20:41:59 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/01 17:48:49 by cguiot           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void	Server::PartUpdate(std::list<Client>::iterator &sender, const std::list<Cha
 	userlist = channel->getAllUser();
 	clientIt = userlist.begin();
 	clientIte = userlist.end();
+
 	while (clientIt != clientIte)
 	{
 		if (msg.empty() == false)
@@ -34,7 +35,6 @@ void	Server::PartUpdate(std::list<Client>::iterator &sender, const std::list<Cha
 	else
 		sendMessage(sender->getFd(), RPL_EMPTYPART(sender->getNick(), channel->getName()));
 }
-
 void	Server::Part(std::list<std::string> tab, std::list<Client>::iterator it)
 {
 	std::list<Channel>::iterator		chanIt;
@@ -61,7 +61,10 @@ void	Server::Part(std::list<std::string> tab, std::list<Client>::iterator it)
 				userlist = chanIt->getAllUser();
 				if (userlist.size() == 0)
 					_channel.erase(chanIt);
-				PartUpdate(it, chanIt, *(++argsIt));
+				if (++argsIt == argsIte)
+					PartUpdate(it, chanIt, "");
+				else
+					PartUpdate(it, chanIt, *(argsIt));
 				return ;
 			}
 			else
