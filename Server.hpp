@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/30 20:42:04 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 11:17:38 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@
 # define ERR_NOTONCHANNEL(channame) (SERVERNAMEHEAD + " 442 " + channame + " :You are not on that channel !" + "\r\n")
 # define ERR_CHANOPPRIVSNEEDED(channame) (SERVERNAMEHEAD + " 482 " + channame + " :You are not channel operator !" + "\r\n")
 # define ERR_UNKNOWMODE(mode) (SERVERNAMEHEAD + " 472 " + mode + " :Is unknow mode to me !" + "\r\n")
+# define ERR_UMODEUNKNOWFLAG(mode) (SERVERNAMEHEAD + " 501 " + mode + " :Unknow MODE flag !" + "\r\n")
 
 # define RPL_PRIVMSG(sender, receiver, msg) (":" + sender + " PRIVMSG " + receiver + " " + msg + "\r\n")
 # define RPL_PONG (SERVERNAMEHEAD + " PONG " + SERVERNAME + " " + SERVERNAMEHEAD + "\r\n")
@@ -60,7 +61,9 @@
 # define RPL_NAMREPLY(nick, channame, userlist) (SERVERNAMEHEAD + " 353 " + nick + " @ " + channame + " :" + userlist + "\r\n")
 # define RPL_EMPTYPART(nick, channame) (":" + nick + " PART " + channame + "\r\n")
 # define RPL_PART(nick, channame, msg) (":" + nick + " PART " + channame + (msg[0] == ':' ? " " : " :") + msg + "\r\n")
-# define RPL_MODE(nick, channame, msg) (":" + nick + " MODE " + channame + " :" + mode  + "\r\n")
+# define RPL_MODE(sender, nick, channame, msg) (":" + sender + " MODE " + channame + " " + mode + " " + nick + "\r\n")
+# define RPL_UMODEIS(target, mode) (SERVERNAMEHEAD + " 221 " + target + " :" + mode + "\r\n")
+# define RPL_CHANNELMODEIS(channame, mode) (SERVERNAMEHEAD + " 324 " + channame + " :" mode + "\r\n")
 
 class	Server
 {
@@ -93,7 +96,8 @@ class	Server
 		void						dataReception(int *max, std::list<Client>::iterator it);
 		int							cutdeBuff(std::list<std::string> *tab, const std::string &buff, const std::string key);
 		void						PartUpdate(std::list<Client>::iterator &sender, const std::list<Channel>::iterator &channel, const std::string &msg);
-		void						ModeUpdate(std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode);
+		void						ModeUpdate(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode);
+		void						userMode(std::list<std::string> tab, std::list<Client>::iterator &sender);
 		void						authentication(std::list<Client>::iterator it, const std::string &buff);
 		void						sendMessage(int fd, const std::string msg);
 		void						msgAll(std::list<std::string> &args, Client &sender);
