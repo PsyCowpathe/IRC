@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:13:07 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/30 14:33:59 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 14:01:13 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	Server::newconnection(int *max)
 	FD_SET(newone.getFd(), &_master);
 	_client.push_back(newone);
 	_nbclient++;
+	std::cout << "NEW USER HAS JOIN THE SERVER" << std::endl;
 }
 
 
@@ -45,9 +46,9 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 		if (ret == 0 || ret == -1)
 		{
 			if (ret == 0)
-				std::cout << "Client disconnected !" << std::endl;
+				std::cout << "CLIENT DISCONNECTED FROM SERVER" << std::endl;
 			else
-				std::cout << "Connection reset by client !" << std::endl;
+				std::cout << "CONNECTION RESET BY CLIENT" << std::endl;
 			std::list<Channel>::iterator	chanit;
 			std::list<Channel>::iterator	chanite;
 
@@ -59,10 +60,7 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 				{
 					list = chanit->getAllUser();
 					if (list.size() == 0)
-					{
 						_channel.erase(chanit);
-						std::cout << "Channel deleted" << std::endl;
-					}
 					else
 					{
 						update = list.begin();
@@ -86,12 +84,13 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 		else
 		{
 			it->setBuff(buff);
-			std::cout << "buff = " << buff << std::endl;
+			std::cout << "BUFF = " << buff << std::endl;
 			if ((i = it->getBuff().find("\r\n", 0)) != std::string::npos)
 			{
 				tmp = it->getBuff().substr(0, i) + "\0";
 				it->eraseBuff(0, i + 2);
-				std::cout << "command = " << tmp << "|" << std::endl;
+				std::cout << "COMMAND = " << tmp << "|" << std::endl;
+				std::cout << "REST = " << it->getBuff() << "|" << std::endl;
 				if (it->getRegistered() == false)
 					authentication(it, tmp);
 				else
@@ -119,6 +118,7 @@ void	Server::routine()
 	{
 		_watchlist = _master;
 		ret = select(max + 1, &_watchlist, NULL, NULL, NULL);
+		std::cout << "-------------------------------NewData-----------------------------------" << std::endl;
 		if (ret == -1)
 			throw SelectException();
 		if (FD_ISSET(_fd, &_watchlist))
@@ -126,6 +126,8 @@ void	Server::routine()
 		it = _client.begin();
 		ite = _client.end();
 		while (it != ite)
+		{
 			dataReception(&max, it++);
+		}
 	}
 }
