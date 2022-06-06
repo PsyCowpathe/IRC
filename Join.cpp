@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:15:37 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/30 20:41:58 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 11:45:57 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,11 @@ void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator it)
 	{
 		if (itt->getName() == *tab.begin())
 		{
+			if (itt->isInviteOnly() == 1 && itt->isInvited(it->getNick()) == 0)
+			{
+					std::cout << "cva pas etre possible frero" << std::endl;
+					return ;
+			}
 			if (itt->addUser(*it) == 1)
 			{
 				sendMessage(it->getFd(), ERR_ALREADYJOIN);

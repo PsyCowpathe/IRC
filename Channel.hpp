@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:57:13 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 10:30:03 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 11:42:53 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ class	Channel
 		int					isJoin(const std::string &nick);
 		int					isOp(const std::string &nick);
 		int					isInviteOnly() const;
+		void				setInviteOnly(const int value);
+		int					isInvited(const std::string &name);
 };
 
 #endif
