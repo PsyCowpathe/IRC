@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:58:20 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 11:42:27 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 14:12:39 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,4 +282,26 @@ int			Channel::isInvited(const std::string &name)
 		it++;
 	}
 	return (0);
+}
+
+void	Channel::addInvite(const Client &client)
+{
+	std::list<Client>::iterator		it;
+	std::list<Client>::iterator		ite;
+
+	if (isInvited(client.getNick()) == 0)
+		_invite.push_back(client);
+	else
+	{
+		it = _invite.begin();
+		ite = _invite.end();
+		while (it != ite)
+		{
+			if (it->getNick() == client.getNick())
+			{
+				_invite.erase(it);
+			}
+			it++;
+		}
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 12:24:13 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 14:12:42 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,32 +30,12 @@
 # define CREATED "10/05/2022 04:20"
 # define SERVERNAMEHEAD (static_cast<std::string>(":") + static_cast<std::string>(SERVERNAME))
 
+//RPL
+
 # define RPL_WELCOME(nickname) (SERVERNAMEHEAD + " 001 " + nickname + " Hi ! Welcome to this awesome IRC server !" + "\r\n")
 # define RPL_YOURHOST(nickname) (SERVERNAMEHEAD + " 002 " + "Your host is " + SERVERNAME + " running version " + VERSION + "\r\n")
 # define RPL_CREATED(nickname) (SERVERNAMEHEAD + " 003 " + "This server was created " + CREATED + "\r\n")
 # define RPL_MYINFO(nickname) (SERVERNAMEHEAD + " 004 " + nickname + " " + SERVERNAME + " " + VERSION + " none " + "none." + "\r\n")
-
-# define ERR_PASSWDMISMATCH (SERVERNAMEHEAD + " 464 " + "Incorrect password !" + "\r\n")
-# define ERR_NEEDMOREPARAMS(command) (SERVERNAMEHEAD + " 461 " + command " :Not enough parameters" + "\r\n")
-# define ERR_NICKNAMEINUSE(nick) (SERVERNAMEHEAD + " 433 " + nick + " :Nickname is already in use" + "\r\n")
-# define ERR_NOSUCHNICK(nick) (SERVERNAMEHEAD + " 401 " + nick + " :No such nick/channel" + "\r\n")
-# define ERR_NEEDPASS (SERVERNAMEHEAD + " 4001 " + "Please enter server password !" + "\r\n")
-# define ERR_NEEDNICK (SERVERNAMEHEAD + " 4002 " + "Please nick yourself !" + "\r\n")
-# define ERR_NEEDUSER (SERVERNAMEHEAD + " 4003 " + "Please give more info about you !" + "\r\n")
-# define ERR_INVALIDCOMMAND (SERVERNAMEHEAD + " 4004 " + "Command not found !" + "\r\n")
-# define ERR_ERRONEUSNICKNAME(nick) (SERVERNAMEHEAD + " 432 " + nick + " :Erroneus nickname" + "\r\n")
-# define ERR_ERRONEUSCHANNAME(channame) (SERVERNAMEHEAD + " 4005 " + channame + " :The channel name must be precede by  '#' character" + "\r\n")
-# define ERR_ALREADYJOIN (SERVERNAMEHEAD + " 4006 " + " :Already join this channel !" + "\r\n")
-# define ERR_CANNOTSENDTOCHAN(channame) (SERVERNAMEHEAD + " 404 " + channame + " :Cannot send to channel" + "\r\n")
-# define ERR_ALREADYREGISTERED (SERVERNAMEHEAD + " 462 " + " :You may not reregister !" + "\r\n")
-# define ERR_NOSUCHCHANNEL(channame) (SERVERNAMEHEAD + " 403 " + channame + " :No such channel !" + "\r\n")
-# define ERR_NOTONCHANNEL(channame) (SERVERNAMEHEAD + " 442 " + channame + " :You are not on that channel !" + "\r\n")
-# define ERR_NOTINCHANNEL(channame, nick) (SERVERNAMEHEAD + " 441 " + channame + " " + nick + " :This user is not in that channel !" + "\r\n")
-# define ERR_CHANOPPRIVSNEEDED(channame) (SERVERNAMEHEAD + " 482 " + channame + " :You are not channel operator !" + "\r\n")
-# define ERR_UNKNOWMODE(mode) (SERVERNAMEHEAD + " 472 " + mode + " :Is unknow mode to me !" + "\r\n")
-# define ERR_UMODEUNKNOWFLAG(mode) (SERVERNAMEHEAD + " 501 " + mode + " :Unknow MODE flag !" + "\r\n")
-# define ERR_INVITEONLYCHAN(channame) (SERVERNAMEHEAD + " 473 " + channame + " :Cannot join channel (+i)")
-
 # define RPL_PRIVMSG(sender, receiver, msg) (":" + sender + " PRIVMSG " + receiver + " " + msg + "\r\n")
 # define RPL_PONG (SERVERNAMEHEAD + " PONG " + SERVERNAME + " " + SERVERNAMEHEAD + "\r\n")
 # define RPL_JOIN(nick, channame) (":" + nick + " JOIN " + channame + "\r\n")
@@ -66,6 +46,34 @@
 # define RPL_MODE(sender, nick, channame, msg) (":" + sender + " MODE " + channame + " " + mode + " " + nick + "\r\n")
 # define RPL_UMODEIS(target, mode) (SERVERNAMEHEAD + " 221 " + target + " :" + mode + "\r\n")
 # define RPL_CHANNELMODEIS(channame, mode) (SERVERNAMEHEAD + " 324 " + channame + " :" mode + "\r\n")
+# define RPL_INVITING(nick, channame) (SERVERNAMEHEAD + " 341 " + channame + " " + nick + "\r\n")
+
+//ERR
+
+# define ERR_NOSUCHNICK(nick) (SERVERNAMEHEAD + " 401 " + nick + " :No such nick/channel" + "\r\n")
+# define ERR_NOSUCHCHANNEL(channame) (SERVERNAMEHEAD + " 403 " + channame + " :No such channel !" + "\r\n")
+# define ERR_CANNOTSENDTOCHAN(channame) (SERVERNAMEHEAD + " 404 " + channame + " :Cannot send to channel" + "\r\n")
+# define ERR_ERRONEUSNICKNAME(nick) (SERVERNAMEHEAD + " 432 " + nick + " :Erroneus nickname" + "\r\n")
+# define ERR_NICKNAMEINUSE(nick) (SERVERNAMEHEAD + " 433 " + nick + " :Nickname is already in use" + "\r\n")
+# define ERR_NOTINCHANNEL(channame, nick) (SERVERNAMEHEAD + " 441 " + channame + " " + nick + " :This user is not in that channel !" + "\r\n")
+# define ERR_NOTONCHANNEL(channame) (SERVERNAMEHEAD + " 442 " + channame + " :You are not on that channel !" + "\r\n")
+# define ERR_USERONCHANNEL(nick, channame) (SERVERNAMEHEAD + " 443 " + channame + " " + nick + " :is already on channel" + "\r\n")
+# define ERR_NEEDMOREPARAMS(command) (SERVERNAMEHEAD + " 461 " + command " :Not enough parameters" + "\r\n")
+# define ERR_ALREADYREGISTERED (SERVERNAMEHEAD + " 462 " + " :You may not reregister !" + "\r\n")
+# define ERR_PASSWDMISMATCH (SERVERNAMEHEAD + " 464 " + "Incorrect password !" + "\r\n")
+# define ERR_UNKNOWMODE(mode) (SERVERNAMEHEAD + " 472 " + mode + " :Is unknow mode to me !" + "\r\n")
+# define ERR_INVITEONLYCHAN(channame) (SERVERNAMEHEAD + " 473 " + channame + " :Cannot join channel (+i)" + "\r\n")
+# define ERR_CHANOPPRIVSNEEDED(channame) (SERVERNAMEHEAD + " 482 " + channame + " :You are not channel operator !" + "\r\n")
+# define ERR_UMODEUNKNOWFLAG(mode) (SERVERNAMEHEAD + " 501 " + mode + " :Unknow MODE flag !" + "\r\n")
+
+//CUSTOM ERR
+
+# define ERR_NEEDPASS (SERVERNAMEHEAD + " 4001 " + "Please enter server password !" + "\r\n")
+# define ERR_NEEDNICK (SERVERNAMEHEAD + " 4002 " + "Please nick yourself !" + "\r\n")
+# define ERR_NEEDUSER (SERVERNAMEHEAD + " 4003 " + "Please give more info about you !" + "\r\n")
+# define ERR_INVALIDCOMMAND (SERVERNAMEHEAD + " 4004 " + "Command not found !" + "\r\n")
+# define ERR_ERRONEUSCHANNAME(channame) (SERVERNAMEHEAD + " 4005 " + channame + " :The channel name must be precede by  '#' character" + "\r\n")
+# define ERR_ALREADYJOIN (SERVERNAMEHEAD + " 4006 " + " :Already join this channel !" + "\r\n")
 
 class	Server
 {
@@ -82,9 +90,8 @@ class	Server
 		fd_set						_watchlist;
 		int							_nbcommand;
 
-		static std::string			commandList[];
-		static void					(Server::*commandFct[])(std::list<std::string> tab, std::list<Client>::iterator it);
 
+		//COMMAND
 		void						Join(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						privMsg(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						Ping(std::list<std::string> tab, std::list<Client>::iterator it);
@@ -92,7 +99,11 @@ class	Server
 		void						User(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						Part(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						Mode(std::list<std::string> tab, std::list<Client>::iterator it);
+		void						Invite(std::list<std::string> tab, std::list<Client>::iterator it);
 
+		//MEMBER
+		static std::string			commandList[];
+		static void					(Server::*commandFct[])(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						newconnection(int *max);
 		int							newMax();
 		void						dataReception(int *max, std::list<Client>::iterator it);

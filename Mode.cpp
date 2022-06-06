@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 19:00:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 12:25:13 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 14:12:38 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ void	Server::modeList(std::list<Client>::iterator &sender, std::list<Client>::it
 void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator it)
 {
 	std::list<std::string>::iterator	argsIt;
-	std::list<std::string>::iterator	argsIte;
 	std::list<Channel>::iterator		chanIt;
 	std::list<Channel>::iterator		chanIte;
 	std::list<Client>::iterator			clientIt;
@@ -109,7 +108,6 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator it)
 		return ;
 	}
 	argsIt = tab.begin();
-	argsIte = tab.end();
 	chanIt = _channel.begin();
 	chanIte = _channel.end();
 	while (chanIt != chanIte)
