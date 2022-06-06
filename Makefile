@@ -6,7 +6,7 @@
 #    By: agirona <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/04 18:15:54 by agirona           #+#    #+#              #
-#    Updated: 2022/06/06 12:31:26 by agirona          ###   ########lyon.fr    #
+#    Updated: 2022/06/06 16:02:54 by agirona          ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,9 @@ NAME = Server
 
 SRC = main.cpp Server.cpp Client.cpp Authentication.cpp Utility.cpp Exception.cpp \
 	  Channel.cpp InitServer.cpp Routine.cpp CommandList.cpp Join.cpp PrivMsg.cpp \
-	  Ping.cpp Nick.cpp User.cpp Part.cpp Mode.cpp Invite.cpp
+	  Ping.cpp Nick.cpp User.cpp Part.cpp Mode.cpp Invite.cpp Notice.cpp Kick.cpp \
+	  Topic.cpp
+
 
 PATH = .
 

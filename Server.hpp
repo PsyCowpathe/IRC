@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 14:12:42 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 17:59:43 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 # define RPL_CREATED(nickname) (SERVERNAMEHEAD + " 003 " + "This server was created " + CREATED + "\r\n")
 # define RPL_MYINFO(nickname) (SERVERNAMEHEAD + " 004 " + nickname + " " + SERVERNAME + " " + VERSION + " none " + "none." + "\r\n")
 # define RPL_PRIVMSG(sender, receiver, msg) (":" + sender + " PRIVMSG " + receiver + " " + msg + "\r\n")
+# define RPL_NOTICE(sender, receiver, msg) (":" + sender + " NOTICE " + receiver + " " + msg + "\r\n")
 # define RPL_PONG (SERVERNAMEHEAD + " PONG " + SERVERNAME + " " + SERVERNAMEHEAD + "\r\n")
 # define RPL_JOIN(nick, channame) (":" + nick + " JOIN " + channame + "\r\n")
 # define RPL_TOPIC(nick, channame, topic) (":" + nick + " 432 " + channame + " :" + topic + "\r\n")
@@ -47,6 +48,11 @@
 # define RPL_UMODEIS(target, mode) (SERVERNAMEHEAD + " 221 " + target + " :" + mode + "\r\n")
 # define RPL_CHANNELMODEIS(channame, mode) (SERVERNAMEHEAD + " 324 " + channame + " :" mode + "\r\n")
 # define RPL_INVITING(nick, channame) (SERVERNAMEHEAD + " 341 " + channame + " " + nick + "\r\n")
+# define RPL_KICK(sender, channame, target, msg) (":" + sender + " KICK " + channame + " " + target + (msg[0] == ':' ? " " : " :") + msg + "\r\n")
+
+//:WiZ!jto@tolsun.oulu.fi KICK #Finnish John
+
+//clientPrompt + " KICK " + channel + " " + nickname + (message.empty() ? "" : (message[0] == ':' ? " " : " :")) + message + CRLF
 
 //ERR
 
@@ -100,6 +106,9 @@ class	Server
 		void						Part(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						Mode(std::list<std::string> tab, std::list<Client>::iterator it);
 		void						Invite(std::list<std::string> tab, std::list<Client>::iterator it);
+		void						Notice(std::list<std::string> tab, std::list<Client>::iterator it);
+		void						Topic(std::list<std::string> tab, std::list<Client>::iterator it);
+		void						Kick(std::list<std::string> tab, std::list<Client>::iterator it);
 
 		//MEMBER
 		static std::string			commandList[];
@@ -119,6 +128,8 @@ class	Server
 		void						authNick(std::list<Client>::iterator it, const std::string &buff);
 		void						authUser(std::list<Client>::iterator it, const std::string &buff);
 		void						detectCommand(std::list<Client>::iterator it, const std::string &buff);
+		void						TopicUpdate(std::list<Client>::iterator &sender, const std::list<Channel>::iterator &channel);
+		void						KickUpdate(const std::list<Client>::iterator &sender, const std::string &target, const std::list<Channel>::iterator &channel, const std::string &msg);
 
 	public :
 		Server(std::string port, std::string pass);
