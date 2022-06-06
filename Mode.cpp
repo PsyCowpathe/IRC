@@ -6,13 +6,13 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 19:00:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 11:22:06 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 12:25:13 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-void	Server::ModeUpdate(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode)
+void	Server::ModeUpdate(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode, const int method)
 {
 	std::list<Client>					list;
 	std::list<Client>::iterator			clientIt;
@@ -24,7 +24,10 @@ void	Server::ModeUpdate(std::list<Client>::iterator &sender, std::list<Client>::
 	clientIte = list.end();
 	while (clientIt != clientIte)
 	{
-		sendMessage(clientIt->getFd(), RPL_MODE(sender->getNick(), target->getNick(), channel->getName(), mode));
+		if (method == 1)
+			sendMessage(clientIt->getFd(), RPL_MODE(sender->getNick(), target->getNick(), channel->getName(), mode));
+		else
+			sendMessage(clientIt->getFd(), RPL_MODE(sender->getNick(), "", channel->getName(), mode));
 		clientIt++;
 	}
 }
@@ -52,6 +55,36 @@ void	Server::userMode(std::list<std::string> tab, std::list<Client>::iterator &s
 	}
 	sendMessage(sender->getFd(), ERR_NOSUCHNICK(*argsIt));
 	return ;
+}
+
+void	Server::modeList(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode)
+{
+	if (mode == "+o")
+	{
+		std::cout << "OPED" << std::endl;
+		channel->addOperator(*target);
+		ModeUpdate(sender, target, channel, mode, 1);
+	}
+	else if (mode == "-o")
+	{
+		std::cout << "DEOPED" << std::endl;
+		channel->deleteOperator(*target);
+		ModeUpdate(sender, target, channel, mode, 1);
+	}
+	else if (mode == "+i")
+	{
+		std::cout << "Invite only" << std::endl;
+		channel->setInviteOnly(1);
+		ModeUpdate(sender, target, channel, mode, 0);
+	}
+	else if (mode == "-i")
+	{
+		std::cout << "Free join" << std::endl;
+		channel->setInviteOnly(0);
+		ModeUpdate(sender, target, channel, mode, 0);
+	}
+	else
+		sendMessage(sender->getFd(), ERR_UNKNOWMODE(mode));
 }
 
 void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator it)
@@ -89,41 +122,39 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator it)
 					sendMessage(it->getFd(), RPL_CHANNELMODEIS(*argsIt, "-i"));
 				else
 					sendMessage(it->getFd(), RPL_CHANNELMODEIS(*argsIt, "+i"));
-				return ;
 			}
-			mode = *(++argsIt);
-			argsIt++;
-			list = chanIt->getAllUser();
-			clientIt = list.begin();
-			clientIte = list.end();
-			while (clientIt != clientIte)
+			else if (tab.size() < 3)
 			{
-				if (clientIt->getNick() == *argsIt)
+				mode = *(++argsIt);
+				clientIt = chanIt->getAllUser().begin();
+				modeList(it, clientIt, chanIt, mode);
+			}
+			else
+			{
+				mode = *(++argsIt);
+				argsIt++;
+				list = chanIt->getAllUser();
+				clientIt = list.begin();
+				clientIte = list.end();
+				while (clientIt != clientIte)
 				{
-					if (chanIt->isOp(it->getNick()) == 1)
+					if (clientIt->getNick() == *argsIt)
 					{
-						if (mode == "+o")
+						if (chanIt->isOp(it->getNick()) == 1)
 						{
-							std::cout << "OPED" << std::endl;
-							chanIt->addOperator(*clientIt);
-							ModeUpdate(it, clientIt, chanIt, mode);
+							modeList(it, clientIt, chanIt, mode);
+							return ;
 						}
-						else if (mode == "-o")
-						{
-							std::cout << "DEOPED" << std::endl;
-							chanIt->deleteOperator(*clientIt);
-							ModeUpdate(it, clientIt, chanIt, mode);
-						}
-						else
-							sendMessage(it->getFd(), ERR_UNKNOWMODE(mode));
+						sendMessage(it->getFd(), ERR_CHANOPPRIVSNEEDED(*tab.begin()));
 						return ;
 					}
-					sendMessage(it->getFd(), ERR_CHANOPPRIVSNEEDED(*tab.begin()));
-					return ;
+					clientIt++;
 				}
-				clientIt++;
+				argsIt = tab.begin();
+				argsIt++;
+				argsIt++;
+				sendMessage(it->getFd(), ERR_NOTINCHANNEL(*tab.begin(), *argsIt));
 			}
-			sendMessage(it->getFd(), ERR_NOTONCHANNEL(*tab.begin()));
 			return ;
 		}
 		chanIt++;

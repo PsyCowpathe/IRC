@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 11:17:38 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 12:24:13 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,11 @@
 # define ERR_ALREADYREGISTERED (SERVERNAMEHEAD + " 462 " + " :You may not reregister !" + "\r\n")
 # define ERR_NOSUCHCHANNEL(channame) (SERVERNAMEHEAD + " 403 " + channame + " :No such channel !" + "\r\n")
 # define ERR_NOTONCHANNEL(channame) (SERVERNAMEHEAD + " 442 " + channame + " :You are not on that channel !" + "\r\n")
+# define ERR_NOTINCHANNEL(channame, nick) (SERVERNAMEHEAD + " 441 " + channame + " " + nick + " :This user is not in that channel !" + "\r\n")
 # define ERR_CHANOPPRIVSNEEDED(channame) (SERVERNAMEHEAD + " 482 " + channame + " :You are not channel operator !" + "\r\n")
 # define ERR_UNKNOWMODE(mode) (SERVERNAMEHEAD + " 472 " + mode + " :Is unknow mode to me !" + "\r\n")
 # define ERR_UMODEUNKNOWFLAG(mode) (SERVERNAMEHEAD + " 501 " + mode + " :Unknow MODE flag !" + "\r\n")
+# define ERR_INVITEONLYCHAN(channame) (SERVERNAMEHEAD + " 473 " + channame + " :Cannot join channel (+i)")
 
 # define RPL_PRIVMSG(sender, receiver, msg) (":" + sender + " PRIVMSG " + receiver + " " + msg + "\r\n")
 # define RPL_PONG (SERVERNAMEHEAD + " PONG " + SERVERNAME + " " + SERVERNAMEHEAD + "\r\n")
@@ -96,7 +98,8 @@ class	Server
 		void						dataReception(int *max, std::list<Client>::iterator it);
 		int							cutdeBuff(std::list<std::string> *tab, const std::string &buff, const std::string key);
 		void						PartUpdate(std::list<Client>::iterator &sender, const std::list<Channel>::iterator &channel, const std::string &msg);
-		void						ModeUpdate(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode);
+		void						ModeUpdate(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode, const int method);
+		void						modeList(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode);
 		void						userMode(std::list<std::string> tab, std::list<Client>::iterator &sender);
 		void						authentication(std::list<Client>::iterator it, const std::string &buff);
 		void						sendMessage(int fd, const std::string msg);

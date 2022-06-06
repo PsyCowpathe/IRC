@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:58:20 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 10:29:54 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 11:42:27 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -261,4 +261,25 @@ int			Channel::isOp(const std::string &nick)
 int			Channel::isInviteOnly() const
 {
 	return (_inviteonly);
+}
+
+void		Channel::setInviteOnly(const int value)
+{
+	_inviteonly = value;
+}
+
+int			Channel::isInvited(const std::string &name)
+{
+	std::list<Client>::iterator		it;
+	std::list<Client>::iterator		ite;
+
+	it = _invite.begin();
+	ite = _invite.end();
+	while (it != ite)
+	{
+		if (it->getNick() == name)
+			return (1);
+		it++;
+	}
+	return (0);
 }
