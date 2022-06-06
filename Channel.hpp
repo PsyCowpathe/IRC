@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:57:13 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 14:12:42 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 17:59:43 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class	Channel
 		void				setInviteOnly(const int value);
 		int					isInvited(const std::string &name);
 		void				addInvite(const Client &client);
+		Client				&findUser(const std::string &client);
 };
 
 #endif

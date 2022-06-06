@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:58:20 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 14:12:39 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 17:59:40 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ int		Channel::addUser(const Client &client)
 		it++;
 	}
 	_user.push_back(client);
-	std::cout << "add = " << client.getNick() << std::endl;
 	return (0); //success
 }
 
@@ -97,7 +96,6 @@ int		Channel::addOperator(const Client &client)
 	if (it == ite)
 	{
 		_op.push_back(client);
-		std::cout << "add = " << client.getNick() << std::endl;
 		return (0); //success
 	}
 	while (it != ite)
@@ -106,7 +104,6 @@ int		Channel::addOperator(const Client &client)
 		{
 			deleteUser(client);
 			_op.push_back(client);
-			std::cout << "add = " << client.getNick() << std::endl;
 			return (0); //success
 		}
 		it++;
@@ -154,7 +151,6 @@ std::list<Client> Channel::getAllUser(void)
 	ite = _op.end();
 	while (it != ite)
 	{
-		std::cout << "op = " << it->getNick() << std::endl;
 		all.push_back(*it);
 		it++;
 	}
@@ -162,11 +158,9 @@ std::list<Client> Channel::getAllUser(void)
 	ite = _user.end();
 	while (it != ite)
 	{
-		std::cout << "user = " << it->getNick() << std::endl;
 		all.push_back(*it);
 		it++;
 	}
-	std::cout << "finished" << std::endl;
 	return (all);
 }
 
@@ -284,7 +278,7 @@ int			Channel::isInvited(const std::string &name)
 	return (0);
 }
 
-void	Channel::addInvite(const Client &client)
+void		Channel::addInvite(const Client &client)
 {
 	std::list<Client>::iterator		it;
 	std::list<Client>::iterator		ite;
@@ -304,4 +298,22 @@ void	Channel::addInvite(const Client &client)
 			it++;
 		}
 	}
+}
+
+Client		&Channel::findUser(const std::string &client)
+{
+	std::list<Client>::iterator		it;
+	std::list<Client>::iterator		ite;
+	std::list<Client>				list;
+
+	list = getAllUser();
+	it = list.begin();
+	ite = list.end();
+	while (it != ite)
+	{
+		if (it->getNick() == client)
+			return (*it);
+		it++;
+	}
+	return (*ite);
 }
