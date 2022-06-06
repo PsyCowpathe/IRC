@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:58:20 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/30 20:42:02 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/06 10:29:54 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 Channel::Channel()
 {
 	_topic = "Default topic.";
+	_inviteonly = 0;
 	//_op.push_back(client);
 }
 
@@ -255,4 +256,9 @@ int			Channel::isOp(const std::string &nick)
 		it++;
 	}
 	return (0);
+}
+
+int			Channel::isInviteOnly() const
+{
+	return (_inviteonly);
 }
