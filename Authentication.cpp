@@ -6,102 +6,95 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/24 17:08:55 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 18:58:18 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-void	Server::authGrant(std::list<Client>::iterator it, const std::string &buff)
+void	Server::authGrant(std::list<Client>::iterator sender, const std::string &buff)
 {
 	std::list<std::string>	tab;
 
 	if (cutdeBuff(&tab, buff, "PASS") == 1)
 	{
 		if (tab.empty() == true || tab.size() < 1)
-			sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("PASS"));
+			sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("PASS"));
 		else if (tab.begin()->compare(_pass) != 0)
-			sendMessage(it->getFd(), ERR_PASSWDMISMATCH);
+			sendMessage(sender->getFd(), ERR_PASSWDMISMATCH);
 		else
-			it->setGranteed(1);
+			sender->setGranteed(1);
 	}
-	//else
-	//	sendMessage(it->getFd(), ERR_NEEDPASS);
 	tab.clear();
 }
 
-void	Server::authNick(std::list<Client>::iterator it, const std::string &buff)
+void	Server::authNick(std::list<Client>::iterator sender, const std::string &buff)
 {
 	std::list<std::string>	tab;
 	size_t					ret;
-	// CAP LS 302
-	ret = -1;
 
+	ret = -1;
 	if (cutdeBuff(&tab, buff, "NICK") == 1)
 	{
 		std::cout << "tab = " << *tab.begin() << std::endl;
 		if (tab.empty() == true || tab.size() < 1)
-			sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("NICK"));
+			sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("NICK"));
 		else if (findStr<std::list<Client>, Client>(_client, *tab.begin(), &Client::getNick) != _client.end())
-			sendMessage(it->getFd(), ERR_NICKNAMEINUSE(*tab.begin()));
+			sendMessage(sender->getFd(), ERR_NICKNAMEINUSE(*tab.begin()));
 		else if ((ret = tab.begin()->find_first_of("@#", 0)) == 0 || ret != std::string::npos)
-			sendMessage(it->getFd(), ERR_ERRONEUSNICKNAME(*tab.begin()));
+			sendMessage(sender->getFd(), ERR_ERRONEUSNICKNAME(*tab.begin()));
 		else
 		{
 			std::list<std::string>::iterator	itt;
 			itt = tab.begin();
-			it->setNick(*itt);
-			it->setNicked(1);
+			sender->setNick(*itt);
+			sender->setNicked(1);
 		}
 	}
-	//else
-	//	sendMessage(it->getFd(), ERR_NEEDNICK);
 	tab.clear();
 }
 
-void	Server::authUser(std::list<Client>::iterator it, const std::string &buff)
+void	Server::authUser(std::list<Client>::iterator sender, const std::string &buff)
 {
 	std::list<std::string>	tab;
 
 	if (cutdeBuff(&tab, buff, "USER") == 1)
 	{
 		if (tab.empty() == true || tab.size() < 4)
-			sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("USER"));
+			sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("USER"));
 		else
 		{
 			std::list<std::string>::iterator	itt;
 			itt = tab.begin();
 			if ((*tab.begin()).size() > PSEUDOLEN)
 				(*itt).resize(20);
-			it->setUser(*itt);
+			sender->setUser(*itt);
 			itt++;
 			itt++;
 			itt++;
-			it->setReal(*itt);
-			it->setUsered(1);
+			sender->setReal(*itt);
+			sender->setUsered(1);
 		}
 	}
-	//else
-	//	sendMessage(it->getFd(), ERR_NEEDUSER);
 	tab.clear();
 }
 
-void	Server::authentication(std::list<Client>::iterator it, const std::string &buff)
+void	Server::authentication(std::list<Client>::iterator sender, const std::string &buff)
 {
-	if (it->getGranteed() == false)
-		authGrant(it, buff);
-	if (it->getGranteed() == true &&  it->getNicked() == false)
-		authNick(it, buff);
-	if (it->getGranteed() == true && it->getUsered() == false)
-		authUser(it, buff);
-	if (it->getGranteed() == true && it->getNicked() == true && it->getUsered() == true)
+	if (sender->getGranteed() == false)
+		authGrant(sender, buff);
+	if (sender->getGranteed() == true &&  sender->getNicked() == false)
+		authNick(sender, buff);
+	if (sender->getGranteed() == true && sender->getUsered() == false)
+		authUser(sender, buff);
+	if (sender->getGranteed() == true && sender->getNicked() == true && sender->getUsered() == true)
 	{
-		std::cout << RPL_WELCOME(it->getNick()) << std::endl;
-		sendMessage(it->getFd(), RPL_WELCOME(it->getNick()));
-		sendMessage(it->getFd(), RPL_YOURHOST(it->getUser()));
-		sendMessage(it->getFd(), RPL_CREATED(it->getUser()));
-		sendMessage(it->getFd(), RPL_MYINFO(it->getUser()));
-		std::cout << "user = " << it->getNick() << " fd = " << it->getFd() << std::endl;
-		it->setRegistered(1);
+		std::cout << RPL_WELCOME(sender->getNick()) << std::endl;
+		sendMessage(sender->getFd(), RPL_WELCOME(sender->getNick()));
+		sendMessage(sender->getFd(), RPL_YOURHOST(sender->getUser()));
+		sendMessage(sender->getFd(), RPL_CREATED(sender->getUser()));
+		sendMessage(sender->getFd(), RPL_MYINFO(sender->getUser()));
+		std::cout << "user = " << sender->getNick() << " fd = " << sender->getFd() << std::endl;
+		sender->setRegistered(1);
 	}
 }

@@ -6,16 +6,14 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:15:37 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 16:03:37 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 18:56:08 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator it)
+void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
-	(void)it;
-	(void)tab;
 	Channel		newone;
 	std::list<Client>				tmp;
 	std::list<Client>::iterator		update;
@@ -24,23 +22,23 @@ void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator it)
 
 	std::cout << "JOIN" << std::endl;
 	if (tab.empty() == true || tab.size() < 1)
-		sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("NICK"));
+		sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("NICK"));
 	else if ((itt = findStr<std::list<Channel>, Channel>(_channel, *tab.begin(), &Channel::getName)) != _channel.end())
 	{
 		if (itt->getName() == *tab.begin())
 		{
-			if (itt->isInviteOnly() == 1 && itt->isInvited(it->getNick()) == 0)
+			if (itt->isInviteOnly() == 1 && itt->isInvited(sender->getNick()) == 0)
 			{
-				sendMessage(it->getFd(), ERR_INVITEONLYCHAN(*tab.begin()));
+				sendMessage(sender->getFd(), ERR_INVITEONLYCHAN(*tab.begin()));
 				return ;
 			}
-			if (itt->addUser(*it) == 1)
+			if (itt->addUser(*sender) == 1)
 			{
-				sendMessage(it->getFd(), ERR_ALREADYJOIN);
+				sendMessage(sender->getFd(), ERR_ALREADYJOIN);
 				return ;
 			}
-			sendMessage(it->getFd(), RPL_JOIN(it->getNick(), *tab.begin()));
-			sendMessage(it->getFd(), RPL_TOPIC(it->getNick(), *tab.begin(), itt->getTopic()));
+			sendMessage(sender->getFd(), RPL_JOIN(sender->getNick(), *tab.begin()));
+			sendMessage(sender->getFd(), RPL_TOPIC(sender->getNick(), *tab.begin(), itt->getTopic()));
 			tmp = itt->getAllUser();
 			update = tmp.begin();
 			endupdate = tmp.end();
@@ -49,7 +47,7 @@ void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator it)
 				sendMessage(update->getFd(), RPL_NAMREPLY(update->getNick(), itt->getName(), itt->getUserList()));
 				update++;
 			}
-			std::cout << "User " << it->getNick() << " joined channel " << *tab.begin() << std::endl;
+			std::cout << "User " << sender->getNick() << " joined channel " << *tab.begin() << std::endl;
 			return ;
 		}
 	}
@@ -57,14 +55,14 @@ void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator it)
 	{
 		if (newone.setName(*tab.begin()) == 1)
 		{
-			sendMessage(it->getFd(), ERR_ERRONEUSCHANNAME(*tab.begin()));
+			sendMessage(sender->getFd(), ERR_ERRONEUSCHANNAME(*tab.begin()));
 			return ;
 		}
 		newone.setName(*tab.begin());
-		newone.addOperator(*it);
-		sendMessage(it->getFd(), RPL_JOIN(it->getNick(), *tab.begin()));
-		sendMessage(it->getFd(), RPL_TOPIC(it->getNick(), *tab.begin(), newone.getTopic()));
-		sendMessage(it->getFd(), RPL_NAMREPLY(it->getNick(), *tab.begin(), newone.getUserList()));
+		newone.addOperator(*sender);
+		sendMessage(sender->getFd(), RPL_JOIN(sender->getNick(), *tab.begin()));
+		sendMessage(sender->getFd(), RPL_TOPIC(sender->getNick(), *tab.begin(), newone.getTopic()));
+		sendMessage(sender->getFd(), RPL_NAMREPLY(sender->getNick(), *tab.begin(), newone.getUserList()));
 		_channel.push_back(newone);
 	}
 }

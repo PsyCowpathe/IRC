@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:14:31 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 17:59:39 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 19:01:56 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,21 @@
 
 std::string     Server::commandList[] =
 {
-	"JOIN",
-	"PRIVMSG",
+	"JOIN", //decoupe les chan
+	"PRIVMSG", //decoupe les targets
 	"PING",
-	"NICK",
+	"NICK", 
 	"USER",
 	"PASS",
-	"PART",
+	"PART", //decoupe les chan
 	"MODE",
 	"INVITE",
-	"NOTICE",
+	"NOTICE", //decoupel les target
 	"TOPIC",
-	"KICK",
-	//LIST
-	//NAME
+	"KICK", //decoupe les target
 };
 
-void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<Client>::iterator it) =
+void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<Client>::iterator sender) =
 {
 	&Server::Join,
 	&Server::privMsg,
@@ -46,7 +44,7 @@ void    (Server::*(Server::commandFct)[])(std::list<std::string> tab, std::list<
 	&Server::Kick,
 };
 
-void	Server::detectCommand(std::list<Client>::iterator it, const std::string &buff)
+void	Server::detectCommand(std::list<Client>::iterator sender, const std::string &buff)
 {
 	int		i;
 	int		valid;
@@ -60,10 +58,10 @@ void	Server::detectCommand(std::list<Client>::iterator it, const std::string &bu
 		{
 			std::cout << "Command detecter" << std::endl;
 			valid = 1;
-			(this->*commandFct[i])(tab, it);
+			(this->*commandFct[i])(tab, sender);
 		}
 		i++;
 	}
 	if (valid == 0)
-		sendMessage(it->getFd(), ERR_INVALIDCOMMAND);
+		sendMessage(sender->getFd(), ERR_INVALIDCOMMAND);
 }

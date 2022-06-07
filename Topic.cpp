@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:36:31 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 17:59:38 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 18:59:08 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,19 +19,26 @@ void	Server::TopicUpdate(std::list<Client>::iterator &sender, const std::list<Ch
 	std::list<Client>					list;
 	std::list<Client>::iterator			clientIt;
 	std::list<Client>::iterator			clientIte;
+	bool								empty;
 
 
 	list = channel->getAllUser();
 	clientIt = list.begin();
 	clientIte = list.end();
+	empty = 0;
+	if (channel->getTopic().size() == 0)
+		empty = 1;
 	while (clientIt != clientIte)
 	{
-		sendMessage(clientIt->getFd(), RPL_TOPIC(sender->getNick(), channel->getName(), channel->getTopic()));
+		if (empty == true)
+			sendMessage(clientIt->getFd(), RPL_EMPTYTOPIC(sender->getNick(), channel->getName()));
+		else
+			sendMessage(clientIt->getFd(), RPL_TOPIC(sender->getNick(), channel->getName(), channel->getTopic()));
 		clientIt++;
 	}
 }
 
-void	Server::Topic(std::list<std::string> tab, std::list<Client>::iterator it)
+void	Server::Topic(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
 	std::list<std::string>::iterator	argsIt;
 	std::list<Channel>::iterator		chanIt;
@@ -39,32 +46,41 @@ void	Server::Topic(std::list<std::string> tab, std::list<Client>::iterator it)
 	std::list<Client>::iterator			clientIt;
 	std::list<Client>::iterator			clientIte;
 	std::list<Client>					list;
+	std::string							channame;
+	std::string							topic;
 
 	std::cout << "TOPIC" << std::endl;
 	if (tab.size() < 1)
 	{
-		sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("MODE"));
+		sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("MODE"));
 		return ;
 	}
 	chanIt = _channel.begin();
 	chanIte = _channel.end();
 	argsIt = tab.begin();
+	channame = *argsIt++;
 	while (chanIt != chanIte)
 	{
-		if (chanIt->getName() == *argsIt)
+		if (chanIt->getName() == channame)
 		{
 			if (tab.size() == 1)
-				sendMessage(it->getFd(), RPL_TOPIC(it->getNick(), *argsIt, chanIt->getTopic()));
-			else if (chanIt->isOp(it->getNick()) == 1)
 			{
-				chanIt->setTopic(*(++argsIt));
-				TopicUpdate(it, chanIt);
+				if (chanIt->getTopic().size() == 0)
+					sendMessage(sender->getFd(), RPL_EMPTYTOPIC(sender->getNick(), channame));
+				else
+					sendMessage(sender->getFd(), RPL_TOPIC(sender->getNick(), channame, chanIt->getTopic()));
+			}
+			else if (chanIt->isOp(sender->getNick()) == 1)
+			{
+				topic = *argsIt;
+				chanIt->setTopic(topic);
+				TopicUpdate(sender, chanIt);
 			}
 			else
-				sendMessage(it->getFd(), ERR_CHANOPPRIVSNEEDED(*(argsIt)));
+				sendMessage(sender->getFd(), ERR_CHANOPPRIVSNEEDED(channame));
 			return ;
 		}
 		chanIt++;
 	}
-	sendMessage(it->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
+	sendMessage(sender->getFd(), ERR_NOSUCHCHANNEL(channame));
 }

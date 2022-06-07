@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 19:00:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 17:59:38 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 18:58:41 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void	Server::modeList(std::list<Client>::iterator &sender, std::list<Client>::it
 		sendMessage(sender->getFd(), ERR_UNKNOWMODE(mode));
 }
 
-void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator it)
+void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
 	std::list<std::string>::iterator	argsIt;
 	std::list<Channel>::iterator		chanIt;
@@ -99,12 +99,12 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator it)
 
 	if (tab.size() < 1)
 	{
-		sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("MODE"));
+		sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("MODE"));
 		return ;
 	}
 	if (!(tab.begin()->find("#", 0) == 0))
 	{
-		userMode(tab, it);
+		userMode(tab, sender);
 		return ;
 	}
 	argsIt = tab.begin();
@@ -117,15 +117,15 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator it)
 			if (tab.size() == 1)
 			{
 				if (chanIt->isInviteOnly() == 0)
-					sendMessage(it->getFd(), RPL_CHANNELMODEIS(*argsIt, "-i"));
+					sendMessage(sender->getFd(), RPL_CHANNELMODEIS(*argsIt, "-i"));
 				else
-					sendMessage(it->getFd(), RPL_CHANNELMODEIS(*argsIt, "+i"));
+					sendMessage(sender->getFd(), RPL_CHANNELMODEIS(*argsIt, "+i"));
 			}
 			else if (tab.size() < 3)
 			{
 				mode = *(++argsIt);
 				clientIt = chanIt->getAllUser().begin();
-				modeList(it, clientIt, chanIt, mode);
+				modeList(sender, clientIt, chanIt, mode);
 			}
 			else
 			{
@@ -138,12 +138,12 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator it)
 				{
 					if (clientIt->getNick() == *argsIt)
 					{
-						if (chanIt->isOp(it->getNick()) == 1)
+						if (chanIt->isOp(sender->getNick()) == 1)
 						{
-							modeList(it, clientIt, chanIt, mode);
+							modeList(sender, clientIt, chanIt, mode);
 							return ;
 						}
-						sendMessage(it->getFd(), ERR_CHANOPPRIVSNEEDED(*tab.begin()));
+						sendMessage(sender->getFd(), ERR_CHANOPPRIVSNEEDED(*tab.begin()));
 						return ;
 					}
 					clientIt++;
@@ -151,11 +151,11 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator it)
 				argsIt = tab.begin();
 				argsIt++;
 				argsIt++;
-				sendMessage(it->getFd(), ERR_NOTINCHANNEL(*tab.begin(), *argsIt));
+				sendMessage(sender->getFd(), ERR_NOTINCHANNEL(*tab.begin(), *argsIt));
 			}
 			return ;
 		}
 		chanIt++;
 	}
-	sendMessage(it->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
+	sendMessage(sender->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
 }

@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 17:59:43 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 19:01:58 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,19 +40,17 @@
 # define RPL_NOTICE(sender, receiver, msg) (":" + sender + " NOTICE " + receiver + " " + msg + "\r\n")
 # define RPL_PONG (SERVERNAMEHEAD + " PONG " + SERVERNAME + " " + SERVERNAMEHEAD + "\r\n")
 # define RPL_JOIN(nick, channame) (":" + nick + " JOIN " + channame + "\r\n")
-# define RPL_TOPIC(nick, channame, topic) (":" + nick + " 432 " + channame + " :" + topic + "\r\n")
+# define RPL_TOPIC(nick, channame, topic) (":" + nick + " 432 " + channame + (topic[0] == ':' ? " " : " :") + topic + "\r\n")
+# define RPL_EMPTYTOPIC(nick, channame) (":" + nick + " 432 " + channame + "\r\n")
 # define RPL_NAMREPLY(nick, channame, userlist) (SERVERNAMEHEAD + " 353 " + nick + " @ " + channame + " :" + userlist + "\r\n")
 # define RPL_EMPTYPART(nick, channame) (":" + nick + " PART " + channame + "\r\n")
 # define RPL_PART(nick, channame, msg) (":" + nick + " PART " + channame + (msg[0] == ':' ? " " : " :") + msg + "\r\n")
 # define RPL_MODE(sender, nick, channame, msg) (":" + sender + " MODE " + channame + " " + mode + " " + nick + "\r\n")
 # define RPL_UMODEIS(target, mode) (SERVERNAMEHEAD + " 221 " + target + " :" + mode + "\r\n")
 # define RPL_CHANNELMODEIS(channame, mode) (SERVERNAMEHEAD + " 324 " + channame + " :" mode + "\r\n")
-# define RPL_INVITING(nick, channame) (SERVERNAMEHEAD + " 341 " + channame + " " + nick + "\r\n")
+# define RPL_INVITING(sender, nick, channame) (SERVERNAMEHEAD + " 341 " + sender + " " + nick + " " + channame + "\r\n")
+# define RPL_INVITED(sender, nick, channame) (":" + sender + " INVITE " + nick + " :" + channame + "\r\n")
 # define RPL_KICK(sender, channame, target, msg) (":" + sender + " KICK " + channame + " " + target + (msg[0] == ':' ? " " : " :") + msg + "\r\n")
-
-//:WiZ!jto@tolsun.oulu.fi KICK #Finnish John
-
-//clientPrompt + " KICK " + channel + " " + nickname + (message.empty() ? "" : (message[0] == ':' ? " " : " :")) + message + CRLF
 
 //ERR
 
