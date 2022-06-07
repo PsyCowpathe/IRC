@@ -6,15 +6,15 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:18:04 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/24 22:20:00 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 18:56:41 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-void	Server::Ping(std::list<std::string> tab, std::list<Client>::iterator it)
+void	Server::Ping(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
 	(void)tab;
 	std::cout << "PONG" << std::endl;
-	sendMessage(it->getFd(), RPL_PONG);
+	sendMessage(sender->getFd(), RPL_PONG);
 }

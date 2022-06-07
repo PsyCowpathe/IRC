@@ -6,13 +6,13 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 12:31:44 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 16:04:13 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 18:58:50 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-void	Server::Invite(std::list<std::string> tab, std::list<Client>::iterator it)
+void	Server::Invite(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
 	std::list<std::string>::iterator	argsIt;
 	std::list<Channel>::iterator		chanIt;
@@ -21,29 +21,31 @@ void	Server::Invite(std::list<std::string> tab, std::list<Client>::iterator it)
 	std::list<Client>::iterator			clientIte;
 	std::list<Client>					list;
 	std::string							nickname;
+	std::string							channame;
 
 	std::cout << "INVITE" << std::endl;
 	if (tab.size() < 2)
 	{
-		sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("INVITE"));
+		sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("INVITE"));
 		return ;
 	}
 	chanIt = _channel.begin();
 	chanIte = _channel.end();
 	argsIt = tab.begin();
 	nickname = *argsIt++;
+	channame = *argsIt;
 	while (chanIt != chanIte)
 	{
 		if (chanIt->getName() == *argsIt)
 		{
-			if (chanIt->isOp(it->getNick()) == 0)
+			if (chanIt->isOp(sender->getNick()) == 0)
 			{
-				sendMessage(it->getFd(), ERR_CHANOPPRIVSNEEDED(*(++argsIt)));
+				sendMessage(sender->getFd(), ERR_CHANOPPRIVSNEEDED(channame));
 				return ;
 			}
 			if (chanIt->isJoin(nickname) == 1)
 			{
-				sendMessage(it->getFd(), ERR_USERONCHANNEL(*argsIt, *(++argsIt)));
+				sendMessage(sender->getFd(), ERR_USERONCHANNEL(nickname, channame));
 				return ;
 			}
 			clientIt = _client.begin();
@@ -53,14 +55,16 @@ void	Server::Invite(std::list<std::string> tab, std::list<Client>::iterator it)
 				if (clientIt->getNick() == nickname)
 				{
 					chanIt->addInvite(*clientIt);
-					sendMessage(it->getFd(), RPL_INVITING(*argsIt, *(++argsIt)));
+					sendMessage(sender->getFd(), RPL_INVITING(sender->getNick(), nickname, channame));
+					sendMessage(clientIt->getFd(), RPL_INVITED(sender->getNick(), nickname, channame));
+					return ;
 				}
 				clientIt++;
 			}
-			sendMessage(it->getFd(), ERR_NOSUCHNICK(*tab.begin()));
+			sendMessage(sender->getFd(), ERR_NOSUCHNICK(nickname));
 			return ;
 		}
 		chanIt++;
 	}
-	sendMessage(it->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
+	sendMessage(sender->getFd(), ERR_NOSUCHCHANNEL(channame));
 }

@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:16:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 15:40:15 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 19:01:23 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 void	Server::msgAll(std::list<std::string> &args, Client &sender)
 {
 	std::list<Client>					list;
-	std::list<Client>::iterator			it;
-	std::list<Client>::iterator			ite;
+	std::list<Client>::iterator			clientIt;
+	std::list<Client>::iterator			clientIte;
 	std::list<Channel>::iterator		chanit;
 	std::list<Channel>::iterator		chanite;
 	std::list<std::string>::iterator	msg;
@@ -31,8 +31,8 @@ void	Server::msgAll(std::list<std::string> &args, Client &sender)
 		return ;
 	}
 	list = chanit->getAllUser();
-	it = list.begin();
-	ite = list.end();
+	clientIt = list.begin();
+	clientIte = list.end();
 	msg = args.begin();
 	msg++;
 	if (chanit->isJoin(sender.getNick()) == 0)
@@ -40,15 +40,15 @@ void	Server::msgAll(std::list<std::string> &args, Client &sender)
 		sendMessage(sender.getFd(), ERR_CANNOTSENDTOCHAN(chanit->getName()));
 		return ;
 	}
-	while (it != ite)
+	while (clientIt != clientIte)
 	{
-		if (it->getNick() != sender.getNick())
-			sendMessage(it->getFd(), RPL_PRIVMSG(sender.getNick(), chanit->getName(), *msg));
-		it++;
+		if (clientIt->getNick() != sender.getNick())
+			sendMessage(clientIt->getFd(), RPL_PRIVMSG(sender.getNick(), chanit->getName(), *msg));
+		clientIt++;
 	}
 }
 
-void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator it)
+void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator clientIt)
 {
 	std::list<Client>::iterator			receiver;
 	std::list<std::string>::iterator	tabit;
@@ -57,12 +57,12 @@ void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator it)
 	if (receiver != _client.end() && tabit->find("#", 0) == std::string::npos)
 	{
 		tabit++;
-		std::cout << it->getNick();
+		std::cout << clientIt->getNick();
 		std::cout << " send --> \"" << *tabit << "\" to " << receiver->getNick() << std::endl;
-		sendMessage(receiver->getFd(), RPL_PRIVMSG(it->getNick(), receiver->getNick(), *tabit));
+		sendMessage(receiver->getFd(), RPL_PRIVMSG(clientIt->getNick(), receiver->getNick(), *tabit));
 	}
 	else if (tabit->find("#", 0) != std::string::npos)
-		msgAll(tab, *it);
+		msgAll(tab, *clientIt);
 	else
-		sendMessage(it->getFd(), ERR_NOSUCHNICK(*tabit));
+		sendMessage(clientIt->getFd(), ERR_NOSUCHNICK(*tabit));
 }

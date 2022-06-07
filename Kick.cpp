@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 16:03:50 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 17:59:36 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 18:59:17 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Server::KickUpdate(const std::list<Client>::iterator &sender, const std::st
 	}
 }
 
-void	Server::Kick(std::list<std::string> tab, std::list<Client>::iterator it)
+void	Server::Kick(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
 	std::list<std::string>::iterator	argsIt;
 	std::list<Channel>::iterator		chanIt;
@@ -40,7 +40,7 @@ void	Server::Kick(std::list<std::string> tab, std::list<Client>::iterator it)
 	std::cout << "KICK" << std::endl;
 	if (tab.size() < 2)
 	{
-		sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("MODE"));
+		sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("MODE"));
 		return ;
 	}
 	chanIt = _channel.begin();
@@ -52,28 +52,28 @@ void	Server::Kick(std::list<std::string> tab, std::list<Client>::iterator it)
 	{
 		if (chanIt->getName() == channel)
 		{
-			if (chanIt->isOp(it->getNick()) == 1)
+			if (chanIt->isOp(sender->getNick()) == 1)
 			{
 				if (chanIt->isJoin(target) == 1)
 				{
 					if (tab.size() == 2)
-						KickUpdate(it, target, chanIt, "");
+						KickUpdate(sender, target, chanIt, "");
 					else
 					{
 						msg = *(++argsIt);
-						KickUpdate(it, target, chanIt, msg.c_str());
+						KickUpdate(sender, target, chanIt, msg.c_str());
 					}
 					chanIt->deleteOperator(chanIt->findUser(target));
 					chanIt->deleteUser(chanIt->findUser(target));
 				}
 				else
-					sendMessage(it->getFd(), ERR_NOTINCHANNEL(*tab.begin(), channel));
+					sendMessage(sender->getFd(), ERR_NOTINCHANNEL(*tab.begin(), channel));
 			}
 			else
-				sendMessage(it->getFd(), ERR_CHANOPPRIVSNEEDED(channel));
+				sendMessage(sender->getFd(), ERR_CHANOPPRIVSNEEDED(channel));
 			return ;
 		}
 		chanIt++;
 	}
-	sendMessage(it->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
+	sendMessage(sender->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
 }

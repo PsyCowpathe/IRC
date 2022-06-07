@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 13:50:33 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 17:59:37 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/07 18:58:32 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void    Server::PartUpdate(std::list<Client>::iterator &sender, const std::list<
         sendMessage(sender->getFd(), RPL_EMPTYPART(sender->getNick(), channel->getName()));
 }
 
-void    Server::Part(std::list<std::string> tab, std::list<Client>::iterator it)
+void    Server::Part(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
     std::list<Channel>::iterator        chanIt;
     std::list<Channel>::iterator        chanIte;
@@ -50,28 +50,28 @@ void    Server::Part(std::list<std::string> tab, std::list<Client>::iterator it)
     argsIt = tab.begin();
     argsIte = tab.end();
     if (tab.empty() == true)
-        return (sendMessage(it->getFd(), ERR_NEEDMOREPARAMS("PART")));
+        return (sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("PART")));
     if (chanIt == chanIte)
-        return (sendMessage(it->getFd(), ERR_NOSUCHCHANNEL(*tab.begin())));
+        return (sendMessage(sender->getFd(), ERR_NOSUCHCHANNEL(*tab.begin())));
     while (chanIt != chanIte)
     {
         if (chanIt->getName() == *argsIt)
         {
-            if (chanIt->deleteUser(*it) == 0)
+            if (chanIt->deleteUser(*sender) == 0)
             {
                 userlist = chanIt->getAllUser();
                 if (userlist.size() == 0)
                     _channel.erase(chanIt);
                 if (++argsIt == argsIte)
-                    PartUpdate(it, chanIt, "");
+                    PartUpdate(sender, chanIt, "");
                 else
-                    PartUpdate(it, chanIt, *argsIt);
+                    PartUpdate(sender, chanIt, *argsIt);
                 return ;
             }
             else
-                return (sendMessage(it->getFd(), ERR_NOTONCHANNEL(chanIt->getName())));
+                return (sendMessage(sender->getFd(), ERR_NOTONCHANNEL(chanIt->getName())));
         }
         chanIt++;
     }
-    sendMessage(it->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
+    sendMessage(sender->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
 }
