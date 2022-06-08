@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 16:03:50 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/08 16:20:27 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/08 19:41:28 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,11 +79,15 @@ void	Server::Kick(std::list<std::string> tab, std::list<Client>::iterator sender
 						sendMessage(sender->getFd(), ERR_NOTINCHANNEL(*tab.begin(), channel));
 				}
 				else
+				{
 					sendMessage(sender->getFd(), ERR_CHANOPPRIVSNEEDED(channel));
+					return ;
+				}
 			}
 			chanIt++;
 		}
 		if (done == 0)
 			sendMessage(sender->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
+		listIt++;
 	}
 }

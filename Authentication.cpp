@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/07 18:58:18 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/08 19:41:26 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ void	Server::authNick(std::list<Client>::iterator sender, const std::string &buf
 	ret = -1;
 	if (cutdeBuff(&tab, buff, "NICK") == 1)
 	{
-		std::cout << "tab = " << *tab.begin() << std::endl;
 		if (tab.empty() == true || tab.size() < 1)
 			sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("NICK"));
 		else if (findStr<std::list<Client>, Client>(_client, *tab.begin(), &Client::getNick) != _client.end())
@@ -89,7 +88,6 @@ void	Server::authentication(std::list<Client>::iterator sender, const std::strin
 		authUser(sender, buff);
 	if (sender->getGranteed() == true && sender->getNicked() == true && sender->getUsered() == true)
 	{
-		std::cout << RPL_WELCOME(sender->getNick()) << std::endl;
 		sendMessage(sender->getFd(), RPL_WELCOME(sender->getNick()));
 		sendMessage(sender->getFd(), RPL_YOURHOST(sender->getUser()));
 		sendMessage(sender->getFd(), RPL_CREATED(sender->getUser()));
