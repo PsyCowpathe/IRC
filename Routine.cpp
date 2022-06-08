@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:13:07 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/08 16:20:28 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/08 19:41:26 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 
 	bzero(buff, buff_size);
 	ret = 1;
+	std::cout << "\\r = " << static_cast<int>('\r') << std::endl;
+	std::cout << "\\n = " << static_cast<int>('\n') << std::endl;
 	if (FD_ISSET(it->getFd(), &_watchlist))
 	{
 		ret = recv(it->getFd(), buff, buff_size, 0);
@@ -85,7 +87,7 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 		{
 			it->setBuff(buff);
 			std::cout << "BUFF = " << buff << std::endl;
-			if ((i = it->getBuff().find("\r\n", 0)) != std::string::npos)
+			while ((i = it->getBuff().find("\r\n", 0)) != std::string::npos)
 			{
 				tmp = it->getBuff().substr(0, i) + "\0";
 				it->eraseBuff(0, i + 2);
