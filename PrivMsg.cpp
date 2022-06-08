@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:16:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/07 19:01:23 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/08 16:20:26 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,21 +48,32 @@ void	Server::msgAll(std::list<std::string> &args, Client &sender)
 	}
 }
 
-void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator clientIt)
+void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
 	std::list<Client>::iterator			receiver;
-	std::list<std::string>::iterator	tabit;
-	tabit = tab.begin();
-	receiver = findStr<std::list<Client>, Client>(_client, *tabit, &Client::getNick);
-	if (receiver != _client.end() && tabit->find("#", 0) == std::string::npos)
+	std::string							msg;
+	std::list<std::string>				list;
+	std::list<std::string>::iterator	listIt;
+	std::list<std::string>::iterator	listIte;
+
+
+	msg = *(++tab.begin());
+	list = cutTab(*tab.begin());
+	listIt = list.begin();
+	listIte = list.end();
+	while (listIt != listIte)
 	{
-		tabit++;
-		std::cout << clientIt->getNick();
-		std::cout << " send --> \"" << *tabit << "\" to " << receiver->getNick() << std::endl;
-		sendMessage(receiver->getFd(), RPL_PRIVMSG(clientIt->getNick(), receiver->getNick(), *tabit));
+		receiver = findStr<std::list<Client>, Client>(_client, *listIt, &Client::getNick);
+		if (receiver != _client.end() && listIt->find("#", 0) == std::string::npos)
+		{
+			std::cout << sender->getNick();
+			std::cout << " send --> \"" << msg << "\" to " << receiver->getNick() << std::endl;
+			sendMessage(receiver->getFd(), RPL_PRIVMSG(sender->getNick(), receiver->getNick(), msg));
+		}
+		else if (listIt->find("#", 0) != std::string::npos)
+			msgAll(tab, *sender);
+		else
+			sendMessage(sender->getFd(), ERR_NOSUCHNICK(*listIt));
+		listIt++;
 	}
-	else if (tabit->find("#", 0) != std::string::npos)
-		msgAll(tab, *clientIt);
-	else
-		sendMessage(clientIt->getFd(), ERR_NOSUCHNICK(*tabit));
 }

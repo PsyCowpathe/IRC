@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:52:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/30 14:33:57 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/08 15:45:02 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,32 @@ int     Server::newMax()
     return (max);
 }
 
+std::list<std::string>		Server::cutTab(std::string str)
+{
+	size_t					pos;
+	std::list<std::string>	res;	
+	std::string				tmp;
+
+	pos = str.find(",", 0);
+	if (pos == std::string::npos)
+		res.push_back(str);
+	else
+	{
+		while (pos != std::string::npos)
+		{
+			tmp = str.substr(0, pos);
+			if (tmp.size() == 1)
+				return (res);
+			res.push_back(tmp);
+			str.erase(0, pos + 1);
+			pos = str.find(",", 0);
+		}
+		if (str.empty() == false)
+			res.push_back(str);
+	}
+	return (res);
+}
+
 int		Server::cutdeBuff(std::list<std::string> *tab, const std::string &buff, const std::string key)
 {
 	std::string							str;
@@ -59,18 +85,8 @@ int		Server::cutdeBuff(std::list<std::string> *tab, const std::string &buff, con
 			point = str.find(":", point);
 			if (point == pos && point != std::string::npos)
 			{
-				/*point = str.find(":", point + 1);
-				//if (point != std::string::npos)
-				//{
-				//	tab->push_back(str.substr(pos + 1, point - pos - 1));
-				//	pos = point + 1;
-				//}
-				//else
-				{*/
 					tab->push_back(str.substr(pos, str.size() - pos));
 					break ;
-				//}
-				//point++;
 			}
 			else
 			{
