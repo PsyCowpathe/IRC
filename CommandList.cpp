@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:14:31 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/07 19:01:56 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/08 16:20:25 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,16 @@
 
 std::string     Server::commandList[] =
 {
-	"JOIN", //decoupe les chan
-	"PRIVMSG", //decoupe les targets
+	"JOIN",
+	"PRIVMSG",
 	"PING",
 	"NICK", 
 	"USER",
 	"PASS",
-	"PART", //decoupe les chan
+	"PART",
 	"MODE",
 	"INVITE",
-	"NOTICE", //decoupel les target
+	"NOTICE",
 	"TOPIC",
 	"KICK", //decoupe les target
 };

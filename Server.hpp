@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/07 19:01:58 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/08 16:20:30 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,7 @@ class	Server
 		void						detectCommand(std::list<Client>::iterator it, const std::string &buff);
 		void						TopicUpdate(std::list<Client>::iterator &sender, const std::list<Channel>::iterator &channel);
 		void						KickUpdate(const std::list<Client>::iterator &sender, const std::string &target, const std::list<Channel>::iterator &channel, const std::string &msg);
+		std::list<std::string>		cutTab(std::string str);
 
 	public :
 		Server(std::string port, std::string pass);

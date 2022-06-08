@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 16:03:50 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/07 18:59:17 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/08 16:20:27 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,10 @@ void	Server::Kick(std::list<std::string> tab, std::list<Client>::iterator sender
 	std::string							channel;
 	std::string							target;
 	std::string							msg;
+	std::list<std::string>				list;
+	std::list<std::string>::iterator	listIt;
+	std::list<std::string>::iterator	listIte;
+	bool								done;
 
 	std::cout << "KICK" << std::endl;
 	if (tab.size() < 2)
@@ -43,37 +47,43 @@ void	Server::Kick(std::list<std::string> tab, std::list<Client>::iterator sender
 		sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("MODE"));
 		return ;
 	}
-	chanIt = _channel.begin();
 	chanIte = _channel.end();
 	argsIt = tab.begin();
 	channel = *argsIt;
 	target = *(++argsIt);
-	while (chanIt != chanIte)
+	msg = *(++argsIt);
+	list = cutTab(target);
+	listIt = list.begin();
+	listIte = list.end();
+	while (listIt != listIte)
 	{
-		if (chanIt->getName() == channel)
+		chanIt = _channel.begin();
+		done = 0;
+		while (chanIt != chanIte)
 		{
-			if (chanIt->isOp(sender->getNick()) == 1)
+			if (chanIt->getName() == channel)
 			{
-				if (chanIt->isJoin(target) == 1)
+				done = 1;
+				if (chanIt->isOp(sender->getNick()) == 1)
 				{
-					if (tab.size() == 2)
-						KickUpdate(sender, target, chanIt, "");
-					else
+					if (chanIt->isJoin(*listIt) == 1)
 					{
-						msg = *(++argsIt);
-						KickUpdate(sender, target, chanIt, msg.c_str());
+						if (tab.size() == 2)
+							KickUpdate(sender, *listIt, chanIt, "");
+						else
+							KickUpdate(sender, *listIt, chanIt, msg.c_str());
+						chanIt->deleteOperator(chanIt->findUser(*listIt));
+						chanIt->deleteUser(chanIt->findUser(*listIt));
 					}
-					chanIt->deleteOperator(chanIt->findUser(target));
-					chanIt->deleteUser(chanIt->findUser(target));
+					else
+						sendMessage(sender->getFd(), ERR_NOTINCHANNEL(*tab.begin(), channel));
 				}
 				else
-					sendMessage(sender->getFd(), ERR_NOTINCHANNEL(*tab.begin(), channel));
+					sendMessage(sender->getFd(), ERR_CHANOPPRIVSNEEDED(channel));
 			}
-			else
-				sendMessage(sender->getFd(), ERR_CHANOPPRIVSNEEDED(channel));
-			return ;
+			chanIt++;
 		}
-		chanIt++;
+		if (done == 0)
+			sendMessage(sender->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
 	}
-	sendMessage(sender->getFd(), ERR_NOSUCHCHANNEL(*tab.begin()));
 }
