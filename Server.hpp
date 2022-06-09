@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/08 16:20:30 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:33:01 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,12 +116,13 @@ class	Server
 		void						dataReception(int *max, std::list<Client>::iterator it);
 		int							cutdeBuff(std::list<std::string> *tab, const std::string &buff, const std::string key);
 		void						PartUpdate(std::list<Client>::iterator &sender, const std::list<Channel>::iterator &channel, const std::string &msg);
-		void						ModeUpdate(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode, const int method);
-		void						modeList(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode);
+		void						ModeUpdate(std::list<Client>::iterator &sender, Client *target, const std::list<Channel>::iterator &channel, const std::string &mode, const int method);
+		void						modeList(std::list<Client>::iterator &sender, Client *target, const std::list<Channel>::iterator &channel, const std::string &mode);
 		void						userMode(std::list<std::string> tab, std::list<Client>::iterator &sender);
 		void						authentication(std::list<Client>::iterator it, const std::string &buff);
 		void						sendMessage(int fd, const std::string msg);
 		void						msgAll(std::list<std::string> &args, Client &sender);
+		void						msgNoticeAll(std::list<std::string> &args, Client &sender);
 		void						authGrant(std::list<Client>::iterator it, const std::string &buff);
 		void						authNick(std::list<Client>::iterator it, const std::string &buff);
 		void						authUser(std::list<Client>::iterator it, const std::string &buff);
@@ -129,6 +130,7 @@ class	Server
 		void						TopicUpdate(std::list<Client>::iterator &sender, const std::list<Channel>::iterator &channel);
 		void						KickUpdate(const std::list<Client>::iterator &sender, const std::string &target, const std::list<Channel>::iterator &channel, const std::string &msg);
 		std::list<std::string>		cutTab(std::string str);
+		std::string					downgrade(const char *str);
 
 	public :
 		Server(std::string port, std::string pass);

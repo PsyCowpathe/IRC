@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 13:50:33 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/08 15:56:15 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:32:58 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 void    Server::PartUpdate(std::list<Client>::iterator &sender, const std::list<Channel>::iterator &channel, const std::string &msg)
 {
-	std::list<Client>::iterator            clientIt;
-	std::list<Client>::iterator            clientIte;
-	std::list<Client>                    userlist;
+	std::list<Client *>::iterator          clientIt;
+	std::list<Client *>::iterator          clientIte;
+	std::list<Client *>                    userlist;
 
 	userlist = channel->getAllUser();
 	clientIt = userlist.begin();
@@ -25,9 +25,9 @@ void    Server::PartUpdate(std::list<Client>::iterator &sender, const std::list<
 	while (clientIt != clientIte)
 	{
 		if (msg.empty() == false)
-			sendMessage(clientIt->getFd(), RPL_PART(sender->getNick(), channel->getName(), msg.c_str()));
+			sendMessage((*clientIt)->getFd(), RPL_PART(sender->getNick(), channel->getName(), msg.c_str()));
 		else
-			sendMessage(clientIt->getFd(), RPL_EMPTYPART(sender->getNick(), channel->getName()));
+			sendMessage((*clientIt)->getFd(), RPL_EMPTYPART(sender->getNick(), channel->getName()));
 		clientIt++;
 	}
 	if (msg.empty() == false)
@@ -42,7 +42,7 @@ void    Server::Part(std::list<std::string> tab, std::list<Client>::iterator sen
 	std::list<Channel>::iterator        chanIte;
 	std::list<std::string>::iterator    argsIt;
 	std::list<std::string>::iterator    argsIte;
-	std::list<Client>                   userlist;
+	std::list<Client *>                 userlist;
 	std::list<std::string>				list;
 	std::list<std::string>::iterator	listIt;
 	std::list<std::string>::iterator	listIte;
@@ -68,7 +68,7 @@ void    Server::Part(std::list<std::string> tab, std::list<Client>::iterator sen
 		{
 			if (chanIt->getName() == *listIt)
 			{
-				if (chanIt->deleteUser(*sender) == 0)
+				if (chanIt->deleteUser(&(*sender)) == 0)
 				{
 					userlist = chanIt->getAllUser();
 					if (userlist.size() == 0)

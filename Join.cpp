@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:15:37 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/08 16:02:15 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:32:59 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
 	Channel								newone;
-	std::list<Client>					tmp;
-	std::list<Client>::iterator			update;
-	std::list<Client>::iterator			endupdate;
+	std::list<Client *>					tmp;
+	std::list<Client *>::iterator		update;
+	std::list<Client *>::iterator		endupdate;
 	std::list<Channel>::iterator		itt;
 	std::list<std::string>				list;
 	std::list<std::string>::iterator	listIt;
@@ -34,13 +34,14 @@ void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator sender
 	listIte = list.end();
 	while (listIt != listIte)
 	{
+		*listIt = downgrade(listIt->c_str());
 		if ((itt = findStr<std::list<Channel>, Channel>(_channel, *listIt, &Channel::getName)) != _channel.end())
 		{
 			if (itt->getName() == *listIt)
 			{
 				if (itt->isInviteOnly() == 1 && itt->isInvited(sender->getNick()) == 0)
 					sendMessage(sender->getFd(), ERR_INVITEONLYCHAN(*listIt));
-				else if (itt->addUser(*sender) == 1)
+				else if (itt->addUser(&(*sender)) == 1)
 					sendMessage(sender->getFd(), ERR_ALREADYJOIN);
 				else
 				{
@@ -51,7 +52,7 @@ void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator sender
 					endupdate = tmp.end();
 					while (update != endupdate)
 					{
-						sendMessage(update->getFd(), RPL_NAMREPLY(update->getNick(), itt->getName(), itt->getUserList()));
+						sendMessage((*update)->getFd(), RPL_NAMREPLY((*update)->getNick(), itt->getName(), itt->getUserList()));
 						update++;
 					}
 					std::cout << "User " << sender->getNick() << " joined channel " << *listIt << std::endl;
@@ -65,7 +66,7 @@ void	Server::Join(std::list<std::string> tab, std::list<Client>::iterator sender
 			else
 			{
 				newone.setName(*listIt);
-				newone.addOperator(*sender);
+				newone.addOperator(&(*sender));
 				sendMessage(sender->getFd(), RPL_JOIN(sender->getNick(), *listIt));
 				sendMessage(sender->getFd(), RPL_TOPIC(sender->getNick(), *listIt, newone.getTopic()));
 				sendMessage(sender->getFd(), RPL_NAMREPLY(sender->getNick(), *listIt, newone.getUserList()));

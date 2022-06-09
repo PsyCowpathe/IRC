@@ -6,11 +6,41 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:32:54 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/08 16:04:29 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:32:56 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+
+void	Server::msgNoticeAll(std::list<std::string> &args, Client &sender)
+{
+	std::list<Client *>					list;
+	std::list<Client *>::iterator			clientIt;
+	std::list<Client *>::iterator			clientIte;
+	std::list<Channel>::iterator		chanit;
+	std::list<Channel>::iterator		chanite;
+	std::list<std::string>::iterator	msg;
+
+	chanit = _channel.begin();
+	chanite = _channel.end();
+	while (chanit != chanite && chanit->getName() != *args.begin())
+		chanit++;
+	if (chanit == chanite)
+		return ;
+	list = chanit->getAllUser();
+	clientIt = list.begin();
+	clientIte = list.end();
+	msg = args.begin();
+	msg++;
+	if (chanit->isJoin(sender.getNick()) == 0)
+		return ;
+	while (clientIt != clientIte)
+	{
+		if ((*clientIt)->getNick() != sender.getNick())
+			sendMessage((*clientIt)->getFd(), RPL_NOTICE(sender.getNick(), chanit->getName(), *msg));
+		clientIt++;
+	}
+}
 
 void	Server::Notice(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
@@ -20,7 +50,8 @@ void	Server::Notice(std::list<std::string> tab, std::list<Client>::iterator send
 	std::list<std::string>::iterator	listIt;
 	std::list<std::string>::iterator	listIte;
 
-
+	if (tab.size() < 2)
+		return ;
 	msg = *(++tab.begin());
 	list = cutTab(*tab.begin());
 	listIt = list.begin();
@@ -35,7 +66,7 @@ void	Server::Notice(std::list<std::string> tab, std::list<Client>::iterator send
 			sendMessage(receiver->getFd(), RPL_NOTICE(sender->getNick(), receiver->getNick(), msg));
 		}
 		else if (listIt->find("#", 0) != std::string::npos)
-			msgAll(tab, *sender);
+			msgNoticeAll(tab, *sender);
 		listIt++;
 	}
 }

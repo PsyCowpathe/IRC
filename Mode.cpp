@@ -6,17 +6,17 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 19:00:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/07 18:58:41 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:32:57 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-void	Server::ModeUpdate(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode, const int method)
+void	Server::ModeUpdate(std::list<Client>::iterator &sender, Client *target, const std::list<Channel>::iterator &channel, const std::string &mode, const int method)
 {
-	std::list<Client>					list;
-	std::list<Client>::iterator			clientIt;
-	std::list<Client>::iterator			clientIte;
+	std::list<Client *>					list;
+	std::list<Client *>::iterator		clientIt;
+	std::list<Client *>::iterator		clientIte;
 
 
 	list = channel->getAllUser();
@@ -25,9 +25,9 @@ void	Server::ModeUpdate(std::list<Client>::iterator &sender, std::list<Client>::
 	while (clientIt != clientIte)
 	{
 		if (method == 1)
-			sendMessage(clientIt->getFd(), RPL_MODE(sender->getNick(), target->getNick(), channel->getName(), mode));
+			sendMessage((*clientIt)->getFd(), RPL_MODE(sender->getNick(), target->getNick(), channel->getName(), mode));
 		else
-			sendMessage(clientIt->getFd(), RPL_MODE(sender->getNick(), "", channel->getName(), mode));
+			sendMessage((*clientIt)->getFd(), RPL_MODE(sender->getNick(), "", channel->getName(), mode));
 		clientIt++;
 	}
 }
@@ -57,18 +57,18 @@ void	Server::userMode(std::list<std::string> tab, std::list<Client>::iterator &s
 	return ;
 }
 
-void	Server::modeList(std::list<Client>::iterator &sender, std::list<Client>::iterator &target, const std::list<Channel>::iterator &channel, const std::string &mode)
+void	Server::modeList(std::list<Client>::iterator &sender, Client *target, const std::list<Channel>::iterator &channel, const std::string &mode)
 {
 	if (mode == "+o")
 	{
 		std::cout << "OPED" << std::endl;
-		channel->addOperator(*target);
+		channel->addOperator(target);
 		ModeUpdate(sender, target, channel, mode, 1);
 	}
 	else if (mode == "-o")
 	{
 		std::cout << "DEOPED" << std::endl;
-		channel->deleteOperator(*target);
+		channel->deleteOperator(target);
 		ModeUpdate(sender, target, channel, mode, 1);
 	}
 	else if (mode == "+i")
@@ -92,9 +92,9 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator sender
 	std::list<std::string>::iterator	argsIt;
 	std::list<Channel>::iterator		chanIt;
 	std::list<Channel>::iterator		chanIte;
-	std::list<Client>::iterator			clientIt;
-	std::list<Client>::iterator			clientIte;
-	std::list<Client>					list;
+	std::list<Client *>::iterator		clientIt;
+	std::list<Client *>::iterator		clientIte;
+	std::list<Client *>					list;
 	std::string							mode;
 
 	if (tab.size() < 1)
@@ -125,7 +125,7 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator sender
 			{
 				mode = *(++argsIt);
 				clientIt = chanIt->getAllUser().begin();
-				modeList(sender, clientIt, chanIt, mode);
+				modeList(sender, *clientIt, chanIt, mode);
 			}
 			else
 			{
@@ -136,11 +136,11 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator sender
 				clientIte = list.end();
 				while (clientIt != clientIte)
 				{
-					if (clientIt->getNick() == *argsIt)
+					if ((*clientIt)->getNick() == *argsIt)
 					{
 						if (chanIt->isOp(sender->getNick()) == 1)
 						{
-							modeList(sender, clientIt, chanIt, mode);
+							modeList(sender, *clientIt, chanIt, mode);
 							return ;
 						}
 						sendMessage(sender->getFd(), ERR_CHANOPPRIVSNEEDED(*tab.begin()));

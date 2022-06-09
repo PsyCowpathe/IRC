@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/08 19:41:26 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:32:55 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ void	Server::authGrant(std::list<Client>::iterator sender, const std::string &bu
 		else
 			sender->setGranteed(1);
 	}
-	tab.clear();
 }
 
 void	Server::authNick(std::list<Client>::iterator sender, const std::string &buff)
@@ -37,8 +36,12 @@ void	Server::authNick(std::list<Client>::iterator sender, const std::string &buf
 	if (cutdeBuff(&tab, buff, "NICK") == 1)
 	{
 		if (tab.empty() == true || tab.size() < 1)
+		{
 			sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("NICK"));
-		else if (findStr<std::list<Client>, Client>(_client, *tab.begin(), &Client::getNick) != _client.end())
+			return ;
+		}
+		*tab.begin() = downgrade(tab.begin()->c_str());
+		if (findStr<std::list<Client>, Client>(_client, *tab.begin(), &Client::getNick) != _client.end())
 			sendMessage(sender->getFd(), ERR_NICKNAMEINUSE(*tab.begin()));
 		else if ((ret = tab.begin()->find_first_of("@#", 0)) == 0 || ret != std::string::npos)
 			sendMessage(sender->getFd(), ERR_ERRONEUSNICKNAME(*tab.begin()));
@@ -50,7 +53,6 @@ void	Server::authNick(std::list<Client>::iterator sender, const std::string &buf
 			sender->setNicked(1);
 		}
 	}
-	tab.clear();
 }
 
 void	Server::authUser(std::list<Client>::iterator sender, const std::string &buff)
@@ -75,7 +77,6 @@ void	Server::authUser(std::list<Client>::iterator sender, const std::string &buf
 			sender->setUsered(1);
 		}
 	}
-	tab.clear();
 }
 
 void	Server::authentication(std::list<Client>::iterator sender, const std::string &buff)
