@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:18:16 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/07 18:56:55 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:32:55 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 void	Server::Nick(std::list<std::string> tab, std::list<Client>::iterator sender)
 {
 	size_t		ret;
+	std::string	save;
 
 	std::cout << "NICK" << std::endl;
 	if (tab.empty() == true || tab.size() < 1)

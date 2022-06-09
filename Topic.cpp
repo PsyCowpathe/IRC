@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:36:31 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/07 18:59:08 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:32:54 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
 
 void	Server::TopicUpdate(std::list<Client>::iterator &sender, const std::list<Channel>::iterator &channel)
 {
-	std::list<Client>					list;
-	std::list<Client>::iterator			clientIt;
-	std::list<Client>::iterator			clientIte;
+	std::list<Client *>					list;
+	std::list<Client *>::iterator			clientIt;
+	std::list<Client *>::iterator			clientIte;
 	bool								empty;
 
 
@@ -31,9 +31,9 @@ void	Server::TopicUpdate(std::list<Client>::iterator &sender, const std::list<Ch
 	while (clientIt != clientIte)
 	{
 		if (empty == true)
-			sendMessage(clientIt->getFd(), RPL_EMPTYTOPIC(sender->getNick(), channel->getName()));
+			sendMessage((*clientIt)->getFd(), RPL_EMPTYTOPIC(sender->getNick(), channel->getName()));
 		else
-			sendMessage(clientIt->getFd(), RPL_TOPIC(sender->getNick(), channel->getName(), channel->getTopic()));
+			sendMessage((*clientIt)->getFd(), RPL_TOPIC(sender->getNick(), channel->getName(), channel->getTopic()));
 		clientIt++;
 	}
 }

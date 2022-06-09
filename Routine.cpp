@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:13:07 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/08 19:41:26 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:32:59 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,13 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 	int						ret;
 	size_t					i;
 	std::string				tmp;
-	std::list<Client>::iterator		update;
-	std::list<Client>::iterator		endupdate;
-	std::list<Client>				list;
+	std::list<Client *>::iterator		update;
+	std::list<Client *>::iterator		endupdate;
+	std::list<Client *>				list;
 
 
 	bzero(buff, buff_size);
 	ret = 1;
-	std::cout << "\\r = " << static_cast<int>('\r') << std::endl;
-	std::cout << "\\n = " << static_cast<int>('\n') << std::endl;
 	if (FD_ISSET(it->getFd(), &_watchlist))
 	{
 		ret = recv(it->getFd(), buff, buff_size, 0);
@@ -58,7 +56,7 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 			chanite = _channel.end();
 			while (chanit != chanite)
 			{
-				if (chanit->deleteUser(*it) == 0)
+				if (chanit->deleteUser(&(*it)) == 0)
 				{
 					list = chanit->getAllUser();
 					if (list.size() == 0)
@@ -69,7 +67,7 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 						endupdate = list.end();
 						while (update != endupdate)
 						{
-							sendMessage(update->getFd(), RPL_EMPTYPART(it->getNick(), chanit->getName()));
+							sendMessage((*update)->getFd(), RPL_EMPTYPART(it->getNick(), chanit->getName()));
 							update++;
 						}
 					}

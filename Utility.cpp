@@ -6,11 +6,30 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:52:02 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/08 15:45:02 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 17:05:29 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+
+std::string		Server::downgrade(const char *str)
+{
+	char			tmp;
+	std::string		res;
+	int				i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] >= 'A' && str[i] <= 'Z')
+			tmp = str[i] + 32;
+		else
+			tmp = str[i];
+		res = res + tmp;
+		i++;
+	}
+	return (res);
+}
 
 void	Server::sendMessage(int fd, std::string msg)
 {

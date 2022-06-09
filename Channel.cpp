@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:58:20 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/06 17:59:40 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:32:59 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,16 @@ Channel::~Channel()
 {
 }
 
-int		Channel::addUser(const Client &client)
+int		Channel::addUser(Client *client)
 {
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
+	std::list<Client *>::iterator		it;
+	std::list<Client *>::iterator		ite;
 
 	it = _user.begin();
 	ite = _user.end();
 	while (it != ite)
 	{
-		if (it->getNick() == client.getNick())
+		if ((*it)->getNick() == client->getNick())
 			return (1); //deja dans le chan
 		it++;
 	}
@@ -40,7 +40,7 @@ int		Channel::addUser(const Client &client)
 	ite = _op.end();
 	while (it != ite)
 	{
-		if (it->getNick() == client.getNick())
+		if ((*it)->getNick() == client->getNick())
 			return (1); //deja dans le chan
 		it++;
 	}
@@ -48,16 +48,16 @@ int		Channel::addUser(const Client &client)
 	return (0); //success
 }
 
-int		Channel::deleteUser(const Client &client)
+int		Channel::deleteUser(Client *client)
 {
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
+	std::list<Client *>::iterator		it;
+	std::list<Client *>::iterator		ite;
 
 	it = _user.begin();
 	ite = _user.end();
 	while (it != ite)
 	{
-		if (it->getNick() == client.getNick())
+		if ((*it)->getNick() == client->getNick())
 		{
 			_user.erase(it);
 			return (0); //success
@@ -68,7 +68,7 @@ int		Channel::deleteUser(const Client &client)
 	ite = _op.end();
 	while (it != ite)
 	{
-		if (it->getNick() == client.getNick())
+		if ((*it)->getNick() == client->getNick())
 		{
 			_op.erase(it);
 			return (0); //success
@@ -78,16 +78,16 @@ int		Channel::deleteUser(const Client &client)
 	return (1); // cant delete user
 }
 
-int		Channel::addOperator(const Client &client)
+int		Channel::addOperator(Client *client)
 {
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
+	std::list<Client *>::iterator		it;
+	std::list<Client *>::iterator		ite;
 
 	it = _op.begin();
 	ite = _op.end();
 	while (it != ite)
 	{
-		if (it->getNick() == client.getNick())
+		if ((*it)->getNick() == client->getNick())
 			return (1); //deja operator
 		it++;
 	}
@@ -100,7 +100,7 @@ int		Channel::addOperator(const Client &client)
 	}
 	while (it != ite)
 	{
-		if (it->getNick() == client.getNick())
+		if ((*it)->getNick() == client->getNick())
 		{
 			deleteUser(client);
 			_op.push_back(client);
@@ -111,16 +111,16 @@ int		Channel::addOperator(const Client &client)
 	return (1); //n'est pas dans le channel
 }
 
-int		Channel::deleteOperator(Client &client)
+int		Channel::deleteOperator(Client *client)
 {
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
+	std::list<Client *>::iterator		it;
+	std::list<Client *>::iterator		ite;
 
 	it = _op.begin();
 	ite = _op.end();
 	while (it != ite)
 	{
-		if (it->getNick() == client.getNick())
+		if ((*it)->getNick() == client->getNick())
 		{
 			_op.erase(it);
 			_user.push_back(client);
@@ -131,21 +131,21 @@ int		Channel::deleteOperator(Client &client)
 	return (1); //peux pas delete si il y est pas
 }
 			
-std::list<Client> Channel::getOp(void) const
+std::list<Client *> Channel::getOp(void) const
 {
 	return (_op);
 }
 
-std::list<Client> Channel::getUser(void) const
+std::list<Client *> Channel::getUser(void) const
 {
 	return (_user);
 }
 
-std::list<Client> Channel::getAllUser(void)
+std::list<Client *> Channel::getAllUser(void)
 {
-	std::list<Client>				all;;
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
+	std::list<Client *>					all;
+	std::list<Client *>::iterator		it;
+	std::list<Client *>::iterator		ite;
 
 	it = _op.begin();
 	ite = _op.end();
@@ -194,14 +194,14 @@ int				Channel::setTopic(const std::string topic)
 std::string		Channel::getUserList(void)
 {
 	std::string						list;
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
+	std::list<Client *>::iterator		it;
+	std::list<Client *>::iterator		ite;
 
 	it = _op.begin();
 	ite = _op.end();
 	while (it != ite)
 	{
-		list = list + "@" + it->getNick();
+		list = list + "@" + (*it)->getNick();
 		if (++it != ite || _user.empty() == false)
 			list = list + " ";
 	}
@@ -209,7 +209,7 @@ std::string		Channel::getUserList(void)
 	ite = _user.end();
 	while (it != ite)
 	{
-		list = list + it->getNick();
+		list = list + (*it)->getNick();
 		if (++it != ite)
 			list = list + " ";
 	}
@@ -218,16 +218,16 @@ std::string		Channel::getUserList(void)
 
 int			Channel::isJoin(const std::string &nick)
 {
-	std::list<Client>			list;
-	std::list<Client>::iterator	it;
-	std::list<Client>::iterator	ite;
+	std::list<Client *>				list;
+	std::list<Client *>::iterator	it;
+	std::list<Client *>::iterator	ite;
 
 	list = getAllUser();
 	it = list.begin();
 	ite = list.end();
 	while (it != ite)
 	{
-		if (it->getNick() == nick)
+		if ((*it)->getNick() == nick)
 			return (1);
 		it++;
 	}
@@ -236,16 +236,16 @@ int			Channel::isJoin(const std::string &nick)
 
 int			Channel::isOp(const std::string &nick)
 {
-	std::list<Client>			list;
-	std::list<Client>::iterator	it;
-	std::list<Client>::iterator	ite;
+	std::list<Client *>				list;
+	std::list<Client *>::iterator	it;
+	std::list<Client *>::iterator	ite;
 
 	list = getOp();
 	it = list.begin();
 	ite = list.end();
 	while (it != ite)
 	{
-		if (it->getNick() == nick)
+		if ((*it)->getNick() == nick)
 			return (1);
 		it++;
 	}
@@ -264,26 +264,26 @@ void		Channel::setInviteOnly(const int value)
 
 int			Channel::isInvited(const std::string &name)
 {
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
+	std::list<Client *>::iterator		it;
+	std::list<Client *>::iterator		ite;
 
 	it = _invite.begin();
 	ite = _invite.end();
 	while (it != ite)
 	{
-		if (it->getNick() == name)
+		if ((*it)->getNick() == name)
 			return (1);
 		it++;
 	}
 	return (0);
 }
 
-void		Channel::addInvite(const Client &client)
+void		Channel::addInvite(Client *client)
 {
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
+	std::list<Client *>::iterator		it;
+	std::list<Client *>::iterator		ite;
 
-	if (isInvited(client.getNick()) == 0)
+	if (isInvited(client->getNick()) == 0)
 		_invite.push_back(client);
 	else
 	{
@@ -291,7 +291,7 @@ void		Channel::addInvite(const Client &client)
 		ite = _invite.end();
 		while (it != ite)
 		{
-			if (it->getNick() == client.getNick())
+			if ((*it)->getNick() == client->getNick())
 			{
 				_invite.erase(it);
 			}
@@ -300,19 +300,23 @@ void		Channel::addInvite(const Client &client)
 	}
 }
 
-Client		&Channel::findUser(const std::string &client)
+Client		*Channel::findUser(const std::string &client)
 {
-	std::list<Client>::iterator		it;
-	std::list<Client>::iterator		ite;
-	std::list<Client>				list;
+	std::list<Client *>::iterator		it;
+	std::list<Client *>::iterator		ite;
+	std::list<Client *>					list;
+	Client								*res;
 
 	list = getAllUser();
 	it = list.begin();
 	ite = list.end();
 	while (it != ite)
 	{
-		if (it->getNick() == client)
-			return (*it);
+		if ((*it)->getNick() == client)
+		{
+			res = *it;
+			return (res);
+		}
 		it++;
 	}
 	return (*ite);

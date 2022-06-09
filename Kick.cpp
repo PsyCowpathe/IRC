@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 16:03:50 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/08 19:41:28 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/09 18:32:56 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,16 @@
 
 void	Server::KickUpdate(const std::list<Client>::iterator &sender, const std::string &target, const std::list<Channel>::iterator &channel, const std::string &msg)
 {
-	std::list<Client>					list;
-	std::list<Client>::iterator			clientIt;
-	std::list<Client>::iterator			clientIte;
+	std::list<Client *>					list;
+	std::list<Client *>::iterator			clientIt;
+	std::list<Client *>::iterator			clientIte;
 
 	list = channel->getAllUser();
 	clientIt = list.begin();
 	clientIte = list.end();
 	while (clientIt != clientIte)
 	{
-		sendMessage(clientIt->getFd(), RPL_KICK(sender->getNick(), channel->getName(), target, msg));
+		sendMessage((*clientIt)->getFd(), RPL_KICK(sender->getNick(), channel->getName(), target, msg));
 		clientIt++;
 	}
 }
