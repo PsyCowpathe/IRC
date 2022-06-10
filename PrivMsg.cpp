@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:16:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/09 18:32:58 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 18:07:03 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,9 @@ void	Server::msgAll(std::list<std::string> &args, Client &sender)
 	std::list<Channel>::iterator		chanit;
 	std::list<Channel>::iterator		chanite;
 	std::list<std::string>::iterator	msg;
+	bool								done;
 
+	done = 0;
 	chanit = _channel.begin();
 	chanite = _channel.end();
 	while (chanit != chanite && chanit->getName() != *args.begin())
@@ -42,10 +44,13 @@ void	Server::msgAll(std::list<std::string> &args, Client &sender)
 	}
 	while (clientIt != clientIte)
 	{
+		done = 1;
 		if ((*clientIt)->getNick() != sender.getNick())
 			sendMessage((*clientIt)->getFd(), RPL_PRIVMSG(sender.getNick(), chanit->getName(), *msg));
 		clientIt++;
 	}
+	if (done == 1)
+		Bot(sender, *msg);
 }
 
 void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator sender)
@@ -74,6 +79,7 @@ void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator sen
 			std::cout << sender->getNick();
 			std::cout << " send --> \"" << msg << "\" to " << receiver->getNick() << std::endl;
 			sendMessage(receiver->getFd(), RPL_PRIVMSG(sender->getNick(), receiver->getNick(), msg));
+			Bot(*sender, msg);
 		}
 		else if (listIt->find("#", 0) != std::string::npos)
 			msgAll(tab, *sender);

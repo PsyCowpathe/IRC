@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 17:20:01 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 18:07:04 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@
 # define ERR_ERRONEUSCHANNAME(channame) (SERVERNAMEHEAD + " 4005 " + channame + " :The channel name must be precede by  '#' character" + "\r\n")
 # define ERR_ALREADYJOIN (SERVERNAMEHEAD + " 4006 " + " :Already join this channel !" + "\r\n")
 
+//BOT
+
 class	Server
 {
 	private :
@@ -94,7 +96,6 @@ class	Server
 		fd_set          			_master;
 		fd_set						_watchlist;
 		int							_nbcommand;
-
 
 		//COMMAND
 		void						Join(std::list<std::string> tab, std::list<Client>::iterator it);
@@ -133,6 +134,9 @@ class	Server
 		std::list<std::string>		cutTab(std::string str);
 		std::string					downgrade(const char *str);
 		void						nickUpdate(std::list<std::string> tab, const Client &sender);
+		void						Bot(const Client &sender, const std::string &msg);
+		static std::string			bot_find[];
+		static std::string			bot_answer[];
 
 	public :
 		Server(std::string port, std::string pass);
