@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:13:07 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 17:19:54 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 19:43:07 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,8 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 					list = chanit->getAllUser();
 					if (list.size() == 0)
 					{
-						_channel.erase(chanit);
-						if (_channel.size() == 0)
-							break;
+						chanit = _channel.erase(chanit);
+						continue ;
 					}
 					else
 					{
@@ -94,7 +93,6 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 				tmp = it->getBuff().substr(0, i) + "\0";
 				it->eraseBuff(0, i + 2);
 				std::cout << "COMMAND = " << tmp << "|" << std::endl;
-				std::cout << "REST = " << it->getBuff() << "|" << std::endl;
 				if (it->getRegistered() == false)
 					authentication(it, tmp);
 				else

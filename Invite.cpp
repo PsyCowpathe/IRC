@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 12:31:44 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/09 18:32:57 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 19:40:23 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ void	Server::Invite(std::list<std::string> tab, std::list<Client>::iterator send
 	chanIt = _channel.begin();
 	chanIte = _channel.end();
 	argsIt = tab.begin();
-	nickname = *argsIt++;
-	channame = *argsIt;
+	nickname = downgrade((argsIt++)->c_str());
+	channame = downgrade(argsIt->c_str());
 	while (chanIt != chanIte)
 	{
 		if (chanIt->getName() == *argsIt)

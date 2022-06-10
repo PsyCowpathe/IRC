@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:18:16 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 17:19:56 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 18:59:18 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ void	Server::Nick(std::list<std::string> tab, std::list<Client>::iterator sender
 		sendMessage(sender->getFd(), ERR_ERRONEUSNICKNAME(*tab.begin()));
 	else
 	{
-		sendMessage(sender->getFd(), RPL_NICK(sender->getNick(), *tab.begin()));
 		nickUpdate(tab, *sender);
 		std::cout << "User : " << sender->getNick() << " is now nicknamed ";
 		sender->setNick(*tab.begin());

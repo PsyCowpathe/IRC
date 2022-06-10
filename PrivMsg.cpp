@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:16:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 18:07:03 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 19:24:59 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void	Server::msgAll(std::list<std::string> &args, Client &sender)
 	done = 0;
 	chanit = _channel.begin();
 	chanite = _channel.end();
+	*args.begin() = downgrade(args.begin()->c_str());
 	while (chanit != chanite && chanit->getName() != *args.begin())
 		chanit++;
 	if (chanit == chanite)
