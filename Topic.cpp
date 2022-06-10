@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:36:31 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/09 18:32:54 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 19:25:00 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	Server::Topic(std::list<std::string> tab, std::list<Client>::iterator sende
 	chanIt = _channel.begin();
 	chanIte = _channel.end();
 	argsIt = tab.begin();
-	channame = *argsIt++;
+	channame = downgrade((argsIt++)->c_str());
 	while (chanIt != chanIte)
 	{
 		if (chanIt->getName() == channame)

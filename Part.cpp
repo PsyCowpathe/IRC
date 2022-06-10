@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 13:50:33 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 17:19:52 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 19:40:22 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,18 +71,15 @@ void    Server::Part(std::list<std::string> tab, std::list<Client>::iterator sen
 				done = 1;
 				if (chanIt->deleteUser(&(*sender)) == 0)
 				{
-					std::cout << "jtry" << std::endl;
 					userlist = chanIt->getAllUser();
-					std::cout << "size = " << userlist.size() << std::endl;
 					if (argsIt == argsIte)
 						PartUpdate(sender, chanIt, "");
 					else
 						PartUpdate(sender, chanIt, *argsIt);
 					if (userlist.size() == 0)
 					{
-						_channel.erase(chanIt);
-						if (_channel.size() == 0)
-							break ;
+						chanIt = _channel.erase(chanIt);
+						continue ;
 					}
 				}
 				else

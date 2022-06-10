@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 16:03:50 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/09 18:32:56 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 19:25:01 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ void	Server::Kick(std::list<std::string> tab, std::list<Client>::iterator sender
 	}
 	chanIte = _channel.end();
 	argsIt = tab.begin();
-	channel = *argsIt;
-	target = *(++argsIt);
+	channel = downgrade(argsIt->c_str());
+	target = downgrade((++argsIt)->c_str());
 	msg = *(++argsIt);
 	list = cutTab(target);
 	listIt = list.begin();

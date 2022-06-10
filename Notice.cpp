@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:32:54 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/09 18:32:56 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 19:25:00 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void	Server::msgNoticeAll(std::list<std::string> &args, Client &sender)
 
 	chanit = _channel.begin();
 	chanite = _channel.end();
+	*args.begin() = downgrade(args.begin()->c_str());
 	while (chanit != chanite && chanit->getName() != *args.begin())
 		chanit++;
 	if (chanit == chanite)
@@ -58,6 +59,7 @@ void	Server::Notice(std::list<std::string> tab, std::list<Client>::iterator send
 	listIte = list.end();
 	while (listIt != listIte)
 	{
+		*listIt = downgrade(listIt->c_str());
 		receiver = findStr<std::list<Client>, Client>(_client, *listIt, &Client::getNick);
 		if (receiver != _client.end() && listIt->find("#", 0) == std::string::npos)
 		{

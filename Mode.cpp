@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 19:00:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/09 18:32:57 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 19:43:08 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,25 +61,21 @@ void	Server::modeList(std::list<Client>::iterator &sender, Client *target, const
 {
 	if (mode == "+o")
 	{
-		std::cout << "OPED" << std::endl;
 		channel->addOperator(target);
 		ModeUpdate(sender, target, channel, mode, 1);
 	}
 	else if (mode == "-o")
 	{
-		std::cout << "DEOPED" << std::endl;
 		channel->deleteOperator(target);
 		ModeUpdate(sender, target, channel, mode, 1);
 	}
 	else if (mode == "+i")
 	{
-		std::cout << "Invite only" << std::endl;
 		channel->setInviteOnly(1);
 		ModeUpdate(sender, target, channel, mode, 0);
 	}
 	else if (mode == "-i")
 	{
-		std::cout << "Free join" << std::endl;
 		channel->setInviteOnly(0);
 		ModeUpdate(sender, target, channel, mode, 0);
 	}
@@ -110,6 +106,7 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator sender
 	argsIt = tab.begin();
 	chanIt = _channel.begin();
 	chanIte = _channel.end();
+	*tab.begin() = downgrade(tab.begin()->c_str());
 	while (chanIt != chanIte)
 	{
 		if (chanIt->getName() == *tab.begin())
@@ -123,14 +120,21 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator sender
 			}
 			else if (tab.size() < 3)
 			{
-				mode = *(++argsIt);
-				clientIt = chanIt->getAllUser().begin();
-				modeList(sender, *clientIt, chanIt, mode);
+				if (chanIt->isOp(sender->getNick()) == 0)
+					sendMessage(sender->getFd(), ERR_CHANOPPRIVSNEEDED(*tab.begin()));
+				else
+				{
+					mode = *(++argsIt);
+					list = chanIt->getAllUser();
+					clientIt = list.begin();
+					modeList(sender, *clientIt, chanIt, mode);
+				}
 			}
 			else
 			{
 				mode = *(++argsIt);
 				argsIt++;
+				*argsIt = downgrade(argsIt->c_str());
 				list = chanIt->getAllUser();
 				clientIt = list.begin();
 				clientIte = list.end();
