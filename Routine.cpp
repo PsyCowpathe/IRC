@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:13:07 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/09 18:32:59 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 17:19:54 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,11 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 				{
 					list = chanit->getAllUser();
 					if (list.size() == 0)
+					{
 						_channel.erase(chanit);
+						if (_channel.size() == 0)
+							break;
+					}
 					else
 					{
 						update = list.begin();
