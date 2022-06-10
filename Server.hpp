@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/09 18:33:01 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 17:20:01 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@
 # define RPL_INVITING(sender, nick, channame) (SERVERNAMEHEAD + " 341 " + sender + " " + nick + " " + channame + "\r\n")
 # define RPL_INVITED(sender, nick, channame) (":" + sender + " INVITE " + nick + " :" + channame + "\r\n")
 # define RPL_KICK(sender, channame, target, msg) (":" + sender + " KICK " + channame + " " + target + (msg[0] == ':' ? " " : " :") + msg + "\r\n")
+# define RPL_NICK(sender, name) (":" + sender + " NICK " + name + "\r\n")
 
 //ERR
 
@@ -131,6 +132,7 @@ class	Server
 		void						KickUpdate(const std::list<Client>::iterator &sender, const std::string &target, const std::list<Channel>::iterator &channel, const std::string &msg);
 		std::list<std::string>		cutTab(std::string str);
 		std::string					downgrade(const char *str);
+		void						nickUpdate(std::list<std::string> tab, const Client &sender);
 
 	public :
 		Server(std::string port, std::string pass);

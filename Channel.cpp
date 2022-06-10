@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 19:58:20 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/09 18:32:59 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 17:19:55 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ int		Channel::deleteUser(Client *client)
 	{
 		if ((*it)->getNick() == client->getNick())
 		{
+			std::cout << "user" << std::endl;
 			_user.erase(it);
 			return (0); //success
 		}
@@ -70,6 +71,7 @@ int		Channel::deleteUser(Client *client)
 	{
 		if ((*it)->getNick() == client->getNick())
 		{
+			std::cout << "opp" << std::endl;
 			_op.erase(it);
 			return (0); //success
 		}
