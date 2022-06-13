@@ -6,7 +6,7 @@
 /*   By: cguiot <cguiot@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/03 18:30:22 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/11 17:38:01 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/13 16:28:03 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int		parseport(char *port)
 		}
 	}
 	nb = atoi(port);
-	if (nb < 0 || nb > 65535)
+	if (nb < 1 || nb > 65535)
 	{
 		std::cout << "The port must be between 0 and 65535 !" << std::endl;
 		return (1);

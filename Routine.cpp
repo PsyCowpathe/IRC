@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:13:07 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/13 15:45:45 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/13 16:24:42 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 		else
 		{
 			buff[ret] = 0;
-			//std::cout << "BUFF = " << buff << std::endl;
+			std::cout << "BUFF = " << buff << std::endl;
 			it->setBuff(buff);
 			while ((i = it->getBuff().find("\r\n", 0)) != std::string::npos)
 			{
