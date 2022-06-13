@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:11:38 by agirona           #+#    #+#             */
-/*   Updated: 2022/05/24 22:16:12 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/13 15:42:36 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	Server::structinit()
 	_infos.ai_canonname = NULL;
 	_infos.ai_addr = NULL;
 	_infos.ai_next = NULL;
-	if (getaddrinfo("127.0.0.1", _port.c_str(), &_infos, &_res) != 0)
+	if (getaddrinfo(NULL, _port.c_str(), &_infos, &_res) != 0)
 	{
 		std::cout << strerror(errno) << std::endl;
 		throw getaddrException();

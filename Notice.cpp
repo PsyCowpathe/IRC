@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:32:54 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 19:25:00 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/13 15:49:32 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ void	Server::Notice(std::list<std::string> tab, std::list<Client>::iterator send
 	std::list<std::string>::iterator	listIt;
 	std::list<std::string>::iterator	listIte;
 
+	std::cout << "NOTICE" << std::endl;
 	if (tab.size() < 2)
 		return ;
 	msg = *(++tab.begin());
@@ -64,7 +65,7 @@ void	Server::Notice(std::list<std::string> tab, std::list<Client>::iterator send
 		if (receiver != _client.end() && listIt->find("#", 0) == std::string::npos)
 		{
 			std::cout << sender->getNick();
-			std::cout << " send --> \"" << msg << "\" to " << receiver->getNick() << std::endl;
+			std::cout << " send notice to " << receiver->getNick() << std::endl;
 			sendMessage(receiver->getFd(), RPL_NOTICE(sender->getNick(), receiver->getNick(), msg));
 		}
 		else if (listIt->find("#", 0) != std::string::npos)

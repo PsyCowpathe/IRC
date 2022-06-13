@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 02:38:28 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 17:19:54 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/13 15:53:41 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,10 @@
 void	Server::authGrant(std::list<Client>::iterator sender, const std::string &buff)
 {
 	std::list<std::string>	tab;
-
+	
 	if (cutdeBuff(&tab, buff, "PASS") == 1)
 	{
+		std::cout << "PASS" << std::endl;
 		if (tab.empty() == true || tab.size() < 1)
 			sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("PASS"));
 		else if (tab.begin()->compare(_pass) != 0)
@@ -35,6 +36,7 @@ void	Server::authNick(std::list<Client>::iterator sender, const std::string &buf
 	ret = -1;
 	if (cutdeBuff(&tab, buff, "NICK") == 1)
 	{
+		std::cout << "NICK" << std::endl;
 		if (tab.empty() == true || tab.size() < 1)
 		{
 			sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("NICK"));
@@ -61,6 +63,7 @@ void	Server::authUser(std::list<Client>::iterator sender, const std::string &buf
 
 	if (cutdeBuff(&tab, buff, "USER") == 1)
 	{
+		std::cout << "USER" << std::endl;
 		if (tab.empty() == true || tab.size() < 4)
 			sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("USER"));
 		else
@@ -89,6 +92,7 @@ void	Server::authentication(std::list<Client>::iterator sender, const std::strin
 		authUser(sender, buff);
 	if (sender->getGranteed() == true && sender->getNicked() == true && sender->getUsered() == true)
 	{
+		std::cout << "User registered !" << std::endl;
 		sendMessage(sender->getFd(), RPL_WELCOME(sender->getNick()));
 		sendMessage(sender->getFd(), RPL_YOURHOST(sender->getUser()));
 		sendMessage(sender->getFd(), RPL_CREATED(sender->getUser()));
