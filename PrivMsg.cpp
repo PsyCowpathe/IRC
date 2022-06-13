@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:16:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 19:24:59 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/13 15:48:20 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator sen
 	std::list<std::string>::iterator	listIt;
 	std::list<std::string>::iterator	listIte;
 
+	std::cout << "PRIVMSG" << std::endl;
 	if (tab.size() < 2)
 	{
 		sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("PRIVMSG"));
@@ -78,7 +79,7 @@ void	Server::privMsg(std::list<std::string> tab, std::list<Client>::iterator sen
 		if (receiver != _client.end() && listIt->find("#", 0) == std::string::npos)
 		{
 			std::cout << sender->getNick();
-			std::cout << " send --> \"" << msg << "\" to " << receiver->getNick() << std::endl;
+			std::cout << " send message to " << receiver->getNick() << std::endl;
 			sendMessage(receiver->getFd(), RPL_PRIVMSG(sender->getNick(), receiver->getNick(), msg));
 			Bot(*sender, msg);
 		}

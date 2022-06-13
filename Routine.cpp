@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 22:13:07 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 19:43:07 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/13 15:45:45 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	Server::newconnection(int *max)
 void	Server::dataReception(int *max, std::list<Client>::iterator it)
 {
 	int						buff_size = 100;
-	char					buff[buff_size];
+	char					buff[buff_size + 1];
 	int						ret;
 	size_t					i;
 	std::string				tmp;
@@ -38,7 +38,6 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 	std::list<Client *>				list;
 
 
-	bzero(buff, buff_size);
 	ret = 1;
 	if (FD_ISSET(it->getFd(), &_watchlist))
 	{
@@ -86,13 +85,14 @@ void	Server::dataReception(int *max, std::list<Client>::iterator it)
 		}
 		else
 		{
+			buff[ret] = 0;
+			//std::cout << "BUFF = " << buff << std::endl;
 			it->setBuff(buff);
-			std::cout << "BUFF = " << buff << std::endl;
 			while ((i = it->getBuff().find("\r\n", 0)) != std::string::npos)
 			{
 				tmp = it->getBuff().substr(0, i) + "\0";
 				it->eraseBuff(0, i + 2);
-				std::cout << "COMMAND = " << tmp << "|" << std::endl;
+				//std::cout << "COMMAND = " << tmp << "|" << std::endl;
 				if (it->getRegistered() == false)
 					authentication(it, tmp);
 				else

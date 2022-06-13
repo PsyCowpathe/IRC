@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 17:24:34 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 18:07:01 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/13 15:43:14 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	Server::Bot(const Client &sender, const std::string &msg)
 
 	i = 0;
 	std::cout << "BOT" << std::endl;
-	botname = "Jesus";
+	botname = "@Jesus@";
 	while (i < 15)
 	{
 		if (msg.find(bot_find[i], 0) != std::string::npos)

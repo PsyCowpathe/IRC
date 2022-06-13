@@ -6,7 +6,7 @@
 #    By: agirona <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/04 18:15:54 by agirona           #+#    #+#              #
-#    Updated: 2022/06/10 17:31:12 by agirona          ###   ########lyon.fr    #
+#    Updated: 2022/06/13 15:46:05 by agirona          ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ HEADER = Server.hpp Client.hpp Channel.hpp
 
 OBJ = $(SRC:.cpp=.o)
 
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g3 -fsanitize=address -I $(PATH)
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -I $(PATH)
 
 %.o: %.cpp $(HEADER)
 	c++ $(CPPFLAGS) -c $< -o $@

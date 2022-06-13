@@ -1,0 +1,7 @@
+PASS asdasdasdasd
+NICK 
+NICK user1
+NICK user2
+USER asdads * * *
+JOIN #FFA
+PRIVMSG adsad asdasdasd

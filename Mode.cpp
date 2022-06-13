@@ -6,7 +6,7 @@
 /*   By: agirona <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 19:00:45 by agirona           #+#    #+#             */
-/*   Updated: 2022/06/10 19:43:08 by agirona          ###   ########lyon.fr   */
+/*   Updated: 2022/06/13 15:49:16 by agirona          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ void	Server::Mode(std::list<std::string> tab, std::list<Client>::iterator sender
 	std::list<Client *>					list;
 	std::string							mode;
 
+	std::cout << "MODE" << std::endl;
 	if (tab.size() < 1)
 	{
 		sendMessage(sender->getFd(), ERR_NEEDMOREPARAMS("MODE"));
